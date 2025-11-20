@@ -210,7 +210,7 @@ export default function BusinessDashboard() {
                 {/* HEADER IMAGE */}
                 <Image
                   source={{
-                    uri: `https://backend1-al4l.onrender.com/${selectedProduct?.product_image?.replace(/\\/g, "/")}`,
+                    uri: selectedProduct?.product_image
                   }}
                   style={{ width: "100%", height: 200, borderRadius: 12, marginBottom: 15 }}
                   resizeMode="contain"
@@ -260,9 +260,7 @@ export default function BusinessDashboard() {
                   {/* DOWNLOAD BUTTON ON TOP */}
                   <Pressable
                     onPress={() =>
-                      downloadQRCode(
-                        `https://backend1-al4l.onrender.com/${selectedProduct.qr_code.replace(/\\/g, "/")}`
-                      )
+                      downloadQRCode(selectedProduct.qr_code)
                     }
                     style={{
                       backgroundColor: "#e98669",
@@ -288,7 +286,7 @@ export default function BusinessDashboard() {
                   {/* QR IMAGE */}
                   {selectedProduct?.qr_code && (
                     <Image
-                      source={{ uri: `http://"https://backend1-al4l.onrender.com/${selectedProduct.qr_code.replace(/\\/g, "/")}` }}
+                      source={{ uri: selectedProduct.qr_code }}
                       style={{ width: 130, height: 130, borderRadius: 8 }}
                       resizeMode="contain"
                     />

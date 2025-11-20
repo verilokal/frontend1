@@ -315,17 +315,10 @@ export default function ProductScanner() {
               {productDetails.product_image && (
                 <Image
                   source={{
-                    uri: `https://backend1-al4l.onrender.com/${productDetails.product_image.replace(
-                      /\\/g,
-                      "/"
-                    )}`,
+                    uri: productDetails?.product_image,
                   }}
-                  style={{
-                    width: "100%",
-                    height: 240,
-                    backgroundColor: "#eee",
-                  }}
-                  resizeMode="cover"
+                  style={{ width: "100%", height: 200, borderRadius: 12, marginBottom: 15 }}
+                  resizeMode="contain"
                 />
               )}
 
