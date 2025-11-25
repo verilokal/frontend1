@@ -3,8 +3,8 @@ import axios from "axios";
 import { useFonts } from "expo-font";
 import { useRouter } from "expo-router";
 import qs from "qs";
-import { useState } from "react";
-import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Dimensions, Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function BusinessLogin() {
   const router = useRouter();
@@ -18,6 +18,16 @@ export default function BusinessLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({}); 
+
+  const [isMobile, setIsMobile] = useState(false);
+    
+    useEffect(() => {
+      const handleResize = () => setIsMobile(Dimensions.get("window").width < 600);
+      handleResize();
+      Dimensions.addEventListener("change", handleResize);
+      return () => Dimensions.removeEventListener("change", handleResize);
+    }, []);
+
 
   const handleBusinessLogin = async () => {
     const newErrors = {};
@@ -70,9 +80,9 @@ export default function BusinessLogin() {
         }}
       >
         {/* Left: Logo + Welcome Text */}
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 20, }}>
           <View
-            style={{
+            style={[{
               backgroundColor: "#fff",
               borderRadius: 20,
               paddingVertical: 20,
@@ -85,19 +95,19 @@ export default function BusinessLogin() {
               shadowOpacity: 0.05,
               shadowRadius: 5,
               elevation: 3,
-            }}
+            }]}
           >
-            <Image source={require("../../assets/images/verilokal_logo.png")} style={{ width: 120, height: 150, marginBottom: 20 }} />
-            <Text style={{ fontSize: 28, fontWeight: "700", color: "#000", textAlign: "center", fontFamily: "Times" }}>
+            <Image source={require("../../assets/images/verilokal_logo.png")} style={{ width: isMobile ? 80: 120, height:isMobile ? 100 : 150, marginBottom: 20 }} />
+            <Text style={[{ fontSize:isMobile ? 22: 28, fontWeight: "570", color: "#000", textAlign: "center", fontFamily: "Montserrat-Regular" }]}>
               Welcome{"\n"}to{"\n"}
-              <Text style={{ color: "#b04224", fontWeight: "800" }}>VeriLocal</Text>
+              <Text style={{ color: "#b04224", fontWeight: "800", fontFamily: "Montserrat-Bold" }}>VeriLocal</Text>
             </Text>
           </View>
         </View>
 
         {/* Right: Login Form */}
-        <View style={{ flex: 1, padding: 20, justifyContent: "center" }}>
-          <Text style={{ fontSize: 22, fontWeight: "700", fontFamily: "Montserrat-Bold", color: "#000", marginBottom: 20 }}>Login</Text>
+        <View style={{ flex: 1, padding: 20, justifyContent: "center", marginLeft: isMobile ? -25: 0 }}>
+          <Text style={{ fontSize: 22, fontWeight: "700", fontFamily: "Montserrat-Bold", color: "#000", marginBottom: isMobile ? 10: 20, }}>Login</Text>
 
           {/* Email */}
           <Text style={{ fontSize: 10, marginBottom: 5, fontFamily: "Montserrat-Regular" }}>Email*</Text>
@@ -114,7 +124,7 @@ export default function BusinessLogin() {
               paddingHorizontal: 15,
               marginBottom: errors.email ? 4 : 15,
               fontFamily: "Montserrat-Regular",
-              fontSize: 12,
+              fontSize: isMobile ? 9.5: 12,
             }}
           />
           {errors.email && <Text style={{ color: "#ff4d4d", fontSize: 12, marginBottom: 10 }}>{errors.email}</Text>}
@@ -135,7 +145,7 @@ export default function BusinessLogin() {
               paddingHorizontal: 15,
               marginBottom: errors.password ? 4 : 20,
               fontFamily: "Montserrat-Regular",
-              fontSize: 12,
+              fontSize: isMobile ? 9.5: 12,
             }}
           />
           {errors.password && <Text style={{ color: "#ff4d4d", fontSize: 12, marginBottom: 10 }}>{errors.password}</Text>}
@@ -144,7 +154,7 @@ export default function BusinessLogin() {
           <TouchableOpacity
             style={{
               backgroundColor: "#e98669",
-              paddingVertical: 12,
+              paddingVertical: isMobile ? 8 :12,
               borderRadius: 20,
               alignItems: "center",
               marginBottom: 10,
@@ -154,11 +164,11 @@ export default function BusinessLogin() {
             }}
             onPress={handleBusinessLogin}
           >
-            <Text style={{ color: "#fff", fontWeight: "600", fontSize: 16, top: -6,}}>Login</Text>
+            <Text style={{ color: "#fff", fontWeight: "600", fontSize: isMobile ? 13: 16,top: isMobile ? 0: -6 }}>Login</Text>
           </TouchableOpacity>
 
           {/* Sign Up Text */}
-          <Text style={{ textAlign: "center", fontFamily: "Montserrat-Regular" }}>
+          <Text style={{ textAlign: "center", fontFamily: "Montserrat-Regular", fontSize: isMobile ? 13: 16 }}>
             Don’t have an account?{" "}
             <Text style={{ color: "#b04224", fontFamily: "Montserrat-Bold" }} onPress={() => router.push("/business/businessRegistration")}>
               Sign up

@@ -4,6 +4,7 @@ import { useFonts } from "expo-font";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  Dimensions,
   FlatList,
   Image,
   Linking,
@@ -11,8 +12,11 @@ import {
   Pressable,
   ScrollView,
   Text,
-  View
+  View,
 } from "react-native";
+
+const windowWidth = Dimensions.get("window").width;
+const isMobile = windowWidth < 768;
 
 export default function BusinessDashboard() {
   const [products, setProducts] = useState([]);
@@ -25,9 +29,10 @@ export default function BusinessDashboard() {
     const fetchProducts = async () => {
       try {
         const token = await AsyncStorage.getItem("token");
-        const res = await axios.get("https://backend1-al4l.onrender.com/api/products/my-products", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          "https://backend1-al4l.onrender.com/api/products/my-products",
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
         setProducts(res.data);
       } catch (err) {
         console.error("Error loading products:", err);
@@ -60,6 +65,40 @@ export default function BusinessDashboard() {
     }
   };
 
+  const printQRCode = (qrUrl) => {
+    if (!qrUrl) return;
+
+    const printWindow = window.open("", "_blank", "width=350,height=450");
+
+    const html = `
+      <html>
+        <head>
+          <style>
+            body { 
+              text-align: center; 
+              padding: 20px; 
+              font-family: Arial; 
+            }
+            img {
+              width: 220px;
+              height: 220px;
+              margin-top: 20px;
+            }
+          </style>
+        </head>
+        <body>
+          <img src="${qrUrl}" />
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+    printWindow.close();
+  };
+
   const [fontsLoaded] = useFonts({
     "Garet-Book": require("../../assets/fonts/garet/Garet-Book.ttf"),
     "Garet-Heavy": require("../../assets/fonts/garet/Garet-Heavy.ttf"),
@@ -85,8 +124,8 @@ export default function BusinessDashboard() {
           width: "100%",
           maxWidth: 900,
           flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
+          justifyContent: isMobile ? "center" : "space-between",
+          textAlign: "center",
           marginBottom: 50,
           gap: 20,
           flexWrap: "wrap",
@@ -97,12 +136,14 @@ export default function BusinessDashboard() {
             fontSize: 32,
             fontFamily: "Garet-Heavy",
             color: "#000",
-            textAlign: "center",
+            textAlign: isMobile ? "center" : "left",
+            width: isMobile ? "100%" : "auto",
           }}
         >
           Business Dashboard
         </Text>
 
+        {/* REGISTER PRODUCT BUTTON */}
         <Pressable
           style={{
             backgroundColor: "#e98669",
@@ -154,9 +195,7 @@ export default function BusinessDashboard() {
                   alignItems: "center",
                 }}
               >
-                <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-                  {item.name}
-                </Text>
+                <Text style={{ fontWeight: "bold", fontSize: 16 }}>{item.name}</Text>
                 <Pressable
                   onPress={() => openModal(item)}
                   style={{
@@ -203,96 +242,149 @@ export default function BusinessDashboard() {
               width: "90%",
               maxWidth: 450,
               elevation: 5,
+              maxHeight: "85%",
             }}
           >
             {selectedProduct && (
               <>
-                {/* HEADER IMAGE */}
-                <Image
-                  source={{
-                    uri: selectedProduct?.product_image
-                  }}
-                  style={{ width: "100%", height: 200, borderRadius: 12, marginBottom: 15 }}
-                  resizeMode="contain"
-                />
-
-                {/* PRODUCT NAME */}
-                <Text style={{ fontSize: 24, fontFamily: "Garet-Heavy", marginBottom: 6 }}>
-                  {selectedProduct.name}
-                </Text>
+                {/* HEADER IMAGES */}
+                {selectedProduct?.product_image && (
+                  <Image
+                    source={{ uri: selectedProduct.product_image }}
+                    style={{
+                      width: "100%",
+                      height: 200,
+                      borderRadius: 12,
+                      resizeMode: "contain",
+                      marginBottom: 15,
+                    }}
+                  />
+                )}
 
                 {/* PRODUCT DETAILS */}
-                <View style={{ marginBottom: 12 }}>
-                  <Text style={{ fontFamily: "Montserrat-Regular" }}>
-                    <Text style={{ fontWeight: "600" }}>Type:</Text> {selectedProduct.type}
-                  </Text>
-                  <Text style={{ fontFamily: "Montserrat-Regular" }}>
-                    <Text style={{ fontWeight: "600" }}>Materials:</Text> {selectedProduct.materials}
-                  </Text>
-                  <Text style={{ fontFamily: "Montserrat-Regular" }}>
-                    <Text style={{ fontWeight: "600" }}>Origin:</Text> {selectedProduct.origin}
-                  </Text>
-                  <Text style={{ fontFamily: "Montserrat-Regular" }}>
-                    <Text style={{ fontWeight: "600" }}>Production Date:</Text> {selectedProduct.productionDate}
-                  </Text>
-                </View>
-
-                {/* DESCRIPTION */}
-                <Text style={{ marginTop: 8, fontWeight: "600", fontSize: 16, fontFamily: "Montserrat-Regular" }}>
-                  Description
-                </Text>
-                <Text style={{ fontFamily: "Montserrat-Regular", marginBottom: 20 }}>
-                  {selectedProduct.description}
-                </Text>
-
-                {/* QR + DOWNLOAD BUTTON STACKED */}
-                <View
-                  style={{
-                    alignItems: "center",
-                    backgroundColor: "#f9f9f9",
-                    padding: 14,
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    borderColor: "#ccc",
-                    marginBottom: 20,
-                  }}
+                <ScrollView
+                  style={{ flexGrow: 1 }}
+                  contentContainerStyle={{ paddingBottom: 20 }}
+                  showsVerticalScrollIndicator={false}
                 >
-                  {/* DOWNLOAD BUTTON ON TOP */}
-                  <Pressable
-                    onPress={() =>
-                      downloadQRCode(selectedProduct.qr_code)
-                    }
+                  <Text style={{ fontSize: 24, fontFamily: "Garet-Heavy", marginBottom: 6 }}>
+                    {selectedProduct.name}
+                  </Text>
+
+                  <View style={{ marginBottom: 12 }}>
+                    <Text style={{ fontFamily: "Montserrat-Regular" }}>
+                      <Text style={{ fontWeight: "600" }}>Type:</Text> {selectedProduct.type}
+                    </Text>
+                    <Text style={{ fontFamily: "Montserrat-Regular" }}>
+                      <Text style={{ fontWeight: "600" }}>Materials:</Text> {selectedProduct.materials}
+                    </Text>
+                    <Text style={{ fontFamily: "Montserrat-Regular" }}>
+                      <Text style={{ fontWeight: "600" }}>Origin:</Text> {selectedProduct.origin}
+                    </Text>
+                    <Text style={{ fontFamily: "Montserrat-Regular" }}>
+                      <Text style={{ fontWeight: "600" }}>Production Date:</Text> {selectedProduct.productionDate}
+                    </Text>
+                  </View>
+
+                  <Text style={{ marginTop: 8, fontWeight: "600", fontSize: 16, fontFamily: "Montserrat-Regular" }}>
+                    Description
+                  </Text>
+                  <Text style={{ fontFamily: "Montserrat-Regular", marginBottom: 20 }}>
+                    {selectedProduct.description}
+                  </Text>
+                  {selectedProduct?.process_image && (
+                    <View style={{ marginBottom: 15, alignItems: "align-left" }}>
+                      <Text
+                        style={{
+                          fontFamily: "Montserrat-Regular",
+                          fontWeight: "600",
+                          marginBottom: 6,
+                        }}
+                      >
+                        Image of the Process
+                      </Text>
+                      <Image
+                        source={{ uri: selectedProduct.process_image }}
+                        style={{
+                          width: "100%",
+                          height: 200,
+                          borderRadius: 12,
+                          resizeMode: "contain",
+                        }}
+                      />
+                    </View>
+                  )}
+
+                  {/* QR + PRINT + DOWNLOAD */}
+                  <View
                     style={{
-                      backgroundColor: "#e98669",
-                      paddingVertical: 6,
-                      paddingHorizontal: 10,
-                      borderRadius: 6,
-                      marginBottom: 10,
+                      alignItems: "center",
+                      backgroundColor: "#f9f9f9",
+                      padding: 14,
+                      borderRadius: 12,
+                      borderWidth: 1,
+                      borderColor: "#ccc",
+                      marginBottom: 20,
                     }}
                   >
-                    <Text
+                    <Pressable
+                      onPress={() => printQRCode(selectedProduct.qr_code)}
                       style={{
-                        color: "#000",
-                        textAlign: "center",
-                        fontWeight: "700",
-                        fontFamily: "Montserrat-Regular",
-                        fontSize: 10,
+                        backgroundColor: "#e98669",
+                        paddingVertical: 6,
+                        paddingHorizontal: 10,
+                        borderRadius: 6,
+                        marginBottom: 6,
+                        width: 90,
                       }}
                     >
-                      DOWNLOAD QR
-                    </Text>
-                  </Pressable>
+                      <Text
+                        style={{
+                          color: "#000",
+                          textAlign: "center",
+                          fontWeight: "700",
+                          fontFamily: "Montserrat-Regular",
+                          fontSize: 10,
+                        }}
+                      >
+                        PRINT QR
+                      </Text>
+                    </Pressable>
 
-                  {/* QR IMAGE */}
-                  {selectedProduct?.qr_code && (
-                    <Image
-                      source={{ uri: selectedProduct.qr_code }}
-                      style={{ width: 130, height: 130, borderRadius: 8 }}
-                      resizeMode="contain"
-                    />
-                  )}
-                </View>
-                {/* BLOCKCHAIN INFO */}
+                    <Pressable
+                      onPress={() => downloadQRCode(selectedProduct.qr_code)}
+                      style={{
+                        backgroundColor: "#e98669",
+                        paddingVertical: 6,
+                        paddingHorizontal: 10,
+                        borderRadius: 6,
+                        marginBottom: 10,
+                        width: 90,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: "#000",
+                          textAlign: "center",
+                          fontWeight: "700",
+                          fontFamily: "Montserrat-Regular",
+                          fontSize: 10,
+                        }}
+                      >
+                        DOWNLOAD
+                      </Text>
+                    </Pressable>
+
+                    {selectedProduct?.qr_code && (
+                      <Image
+                        source={{ uri: selectedProduct.qr_code }}
+                        style={{ width: 130, height: 130, borderRadius: 8 }}
+                        resizeMode="contain"
+                      />
+                    )}
+                  </View>
+
+                  {/* BLOCKCHAIN INFO */}
                   <View
                     style={{
                       backgroundColor: "#f4f4f4",
@@ -318,13 +410,10 @@ export default function BusinessDashboard() {
                       {selectedProduct.tx_hash}
                     </Text>
 
-                    
                     {selectedProduct.tx_hash && (
                       <Pressable
                         onPress={() =>
-                          Linking.openURL(
-                            `https://eth-sepolia.blockscout.com/tx/${selectedProduct.tx_hash}`
-                          )
+                          Linking.openURL(`https://eth-sepolia.blockscout.com/tx/${selectedProduct.tx_hash}`)
                         }
                         style={{
                           backgroundColor: "#e98669",
@@ -347,26 +436,27 @@ export default function BusinessDashboard() {
                     )}
                   </View>
 
-                {/* CLOSE */}
-                <Pressable
-                  style={{
-                    backgroundColor: "#000",
-                    paddingVertical: 12,
-                    borderRadius: 10,
-                  }}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text
+                  {/* CLOSE */}
+                  <Pressable
                     style={{
-                      color: "#fff",
-                      textAlign: "center",
-                      fontWeight: "700",
-                      fontFamily: "Montserrat-Regular",
+                      backgroundColor: "#000",
+                      paddingVertical: 12,
+                      borderRadius: 10,
                     }}
+                    onPress={() => setModalVisible(false)}
                   >
-                    CLOSE
-                  </Text>
-                </Pressable>
+                    <Text
+                      style={{
+                        color: "#fff",
+                        textAlign: "center",
+                        fontWeight: "700",
+                        fontFamily: "Montserrat-Regular",
+                      }}
+                    >
+                      CLOSE
+                    </Text>
+                  </Pressable>
+                </ScrollView>
               </>
             )}
           </View>

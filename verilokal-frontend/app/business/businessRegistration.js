@@ -19,7 +19,6 @@ export default function RegisterProduct() {
   const [name, setOwnerName] = useState("");
   const [address, setAddress] = useState("");
   const [business_name, setRegisteredBusinessName] = useState("");
-  const [registration_number, setRegistrationNumber] = useState("");
   const [description, setDescription] = useState("");
   const [product_img, setProductImage] = useState(null);
   const [certificates, setCertificates] = useState(null);
@@ -79,11 +78,9 @@ export default function RegisterProduct() {
     if (!name) newErrors.name = "Owner name is required!";
     if (!address) newErrors.address = "Address is required!";
     if (!business_name) newErrors.business_name = "Business name is required!";
-    if (!registration_number) newErrors.registration_number = "Registration number is required!";
     if (!description) newErrors.description = "Description is required!";
-    if (!product_img) newErrors.product_img = "Product image is required!";
-    if (!certificates) newErrors.certificates = "Certificate is required!";
-    if (!logo) newErrors.logo = "Business logo is required!";
+    if (!product_img) newErrors.product_img = "Certificate is required!";
+    if (!certificates) newErrors.certificates = "Business Permit is required!";
     if (!email) newErrors.email = "Email is required!";
     if (!password) newErrors.password = "Password is required!";
     if (!contact_no) newErrors.contact_no = "Contact Number is required!";
@@ -112,7 +109,6 @@ export default function RegisterProduct() {
       formData.append("name", name);
       formData.append("address", address);
       formData.append("registered_business_name", business_name);
-      formData.append("registration_number", registration_number);
       formData.append("description", description);
       formData.append("email", email);
       formData.append("password", password);
@@ -135,7 +131,7 @@ export default function RegisterProduct() {
       Alert.alert("Success", "Business registered successfully!");
       setStatusMessage("✅ Business Registered Successfully!");
       setStatusType("success");
-      setOwnerName(""); setAddress(""); setRegisteredBusinessName(""); setRegistrationNumber("");
+      setOwnerName(""); setAddress(""); setRegisteredBusinessName("");
       setDescription(""); setProductImage(null); setCertificates(null); setBusinessLogo(null);
       setEmail(""); setPassword(""); setContactNo(""); setErrors({}); setConsent(false);
 
@@ -143,7 +139,6 @@ export default function RegisterProduct() {
       const msg = error.response?.data?.message;
 
       if (msg?.includes("Registered Business Name")) setErrors(prev => ({ ...prev, business_name: "Business Name already exists!" }));
-      if (msg?.includes("Registration Number")) setErrors(prev => ({ ...prev, registration_number: "Registration Number already exists!" }));
       if (msg?.includes("Email")) setErrors(prev => ({ ...prev, email: "Email already exists!" }));
 
       setStatusMessage("❌ Failed to register business.");
@@ -189,22 +184,13 @@ export default function RegisterProduct() {
           {/** Business Name */}
           <Text style={styles.label}>BUSINESS NAME*</Text>
           <TextInput
-            placeholder="Business Name"
+            placeholder="Your DTI Registered Business Name"
             value={business_name}
             onChangeText={setRegisteredBusinessName}
             style={styles.input(isMobile, !!errors.business_name)}
           />
           {errors.business_name && <Text style={styles.errorText}>{errors.business_name}</Text>}
 
-          {/** Registration Number */}
-          <Text style={styles.label}>REGISTRATION NUMBER*</Text>
-          <TextInput
-            placeholder="Registration Number (DTI)"
-            value={registration_number}
-            onChangeText={setRegistrationNumber}
-            style={styles.input(isMobile, !!errors.registration_number)}
-          />
-          {errors.registration_number && <Text style={styles.errorText}>{errors.registration_number}</Text>}
 
           {/** Email */}
           <Text style={styles.label}>EMAIL*</Text>
@@ -259,31 +245,31 @@ export default function RegisterProduct() {
           {errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
 
           {/** Product Image */}
-            <Text style={styles.label}>PRODUCT IMAGE*</Text>
+            <Text style={styles.label}>CERTIFICATE*</Text>
             <Pressable
               onPress={() => pickImage(setProductImage)}
               style={[styles.uploadBox(isMobile), !!errors.product_img && { borderColor: "red" }]}
             >
               <Text style={{ fontSize: 26 }}>📷</Text>
-              {!product_img && <Text style={styles.uploadText}>Upload Product Image</Text>}
+              {!product_img && <Text style={styles.uploadText}>Upload Certificate</Text>}
               {product_img && <Text style={styles.uploadedText}>Uploaded: {product_img.name}</Text>}
             </Pressable>
             {errors.product_img && <Text style={[styles.errorText, { marginTop: -15, marginBottom: 20 }]}>{errors.product_img}</Text>}
 
-            {/** Certificates */}
-            <Text style={styles.label}>CERTIFICATES*</Text>
+            {/** Business Permit/Mayor's Permit */}
+            <Text style={styles.label}>BUSINESS PERMIT*</Text>
             <Pressable
               onPress={() => pickImage(setCertificates)}
               style={[styles.uploadBox(isMobile), !!errors.certificates && { borderColor: "red" }]}
             >
               <Text style={{ fontSize: 26 }}>📜</Text>
-              {!certificates && <Text style={styles.uploadText}>Upload Certificate</Text>}
+              {!certificates && <Text style={styles.uploadText}>Upload Business Permit</Text>}
               {certificates && <Text style={styles.uploadedText}>Uploaded: {certificates.name}</Text>}
             </Pressable>
             {errors.certificates && <Text style={[styles.errorText, { marginTop: -15, marginBottom: 20 }]}>{errors.certificates}</Text>}
 
             {/** Business Logo */}
-            <Text style={styles.label}>BUSINESS LOGO*</Text>
+            <Text style={styles.label}>BUSINESS LOGO (Optional)</Text>
             <Pressable
               onPress={() => pickImage(setBusinessLogo)}
               style={[styles.uploadBox(isMobile), !!errors.logo && { borderColor: "red" }]}

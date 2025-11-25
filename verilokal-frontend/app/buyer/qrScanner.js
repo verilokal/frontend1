@@ -285,6 +285,7 @@ export default function ProductScanner() {
         </View>
       )}
 
+    {/* Modal */}
     <Modal visible={modalVisible} animationType="fade" transparent>
       <View
         style={{
@@ -300,7 +301,6 @@ export default function ProductScanner() {
             width: "92%",
             maxWidth: 420,
             borderRadius: 20,
-            padding: 0,
             backgroundColor: "rgba(255,255,255,0.97)",
             shadowColor: "#000",
             shadowOpacity: 0.2,
@@ -311,18 +311,14 @@ export default function ProductScanner() {
         >
           {productDetails && (
             <>
-              {/* IMAGE ON TOP */}
+              {/* Product Image */}
               {productDetails.product_image && (
                 <Image
-                  source={{
-                    uri: productDetails?.product_image,
-                  }}
-                  style={{ width: "100%", height: 200, borderRadius: 12, marginBottom: 15 }}
-                  resizeMode="contain"
+                  source={{ uri: productDetails.product_image }}
+                  style={{ width: "100%", height: 200, borderRadius: 12, resizeMode: "contain" }}
                 />
               )}
 
-              {/* CONTENT */}
               <View style={{ padding: 20 }}>
                 <Text
                   style={{
@@ -336,56 +332,35 @@ export default function ProductScanner() {
                   {productDetails.name}
                 </Text>
 
-                <View
-                  style={{
-                    height: 1,
-                    backgroundColor: "#e0e0e0",
-                    marginVertical: 10,
-                  }}
-                />
+                <View style={{ height: 1, backgroundColor: "#e0e0e0", marginVertical: 10 }} />
 
-                {/* Details */}
-                <Text
-                  style={{
-                    fontSize: 18,
-                    fontFamily: "Montserrat-Regular",
-                    marginBottom: 10,
-                    color: "#555",
-                    textAlign: "center",
-                    fontWeight: "700",
-                  }}
-                >
+                {/* Registered Artisan */}
+                <Text style={{
+                  fontSize: 18,
+                  fontFamily: "Montserrat-Regular",
+                  marginBottom: 10,
+                  color: "#555",
+                  textAlign: "center",
+                  fontWeight: "700"
+                }}>
                   {registered_business_name ? `Registered Artisan: ${registered_business_name}` : ""}
                 </Text>
+
                 <View style={{ gap: 6 }}>
                   <Text style={{ fontSize: 16, color: "#444" }}>
-                    <Text style={{ fontWeight: "700" }}>Type: </Text>
-                    {productDetails.type}
+                    <Text style={{ fontWeight: "700" }}>Type: </Text>{productDetails.type}
                   </Text>
-
                   <Text style={{ fontSize: 16, color: "#444" }}>
-                    <Text style={{ fontWeight: "700" }}>Materials: </Text>
-                    {productDetails.materials}
+                    <Text style={{ fontWeight: "700" }}>Materials: </Text>{productDetails.materials}
                   </Text>
-
                   <Text style={{ fontSize: 16, color: "#444" }}>
-                    <Text style={{ fontWeight: "700" }}>Origin: </Text>
-                    {productDetails.origin}
+                    <Text style={{ fontWeight: "700" }}>Origin: </Text>{productDetails.origin}
                   </Text>
-
                   <Text style={{ fontSize: 16, color: "#444" }}>
-                    <Text style={{ fontWeight: "700" }}>Production Date: </Text>
-                    {productDetails.productionDate}
+                    <Text style={{ fontWeight: "700" }}>Production Date: </Text>{productDetails.productionDate}
                   </Text>
 
-                  <Text
-                    style={{
-                      marginTop: 10,
-                      fontWeight: "700",
-                      fontSize: 16,
-                      color: "#333",
-                    }}
-                  >
+                  <Text style={{ marginTop: 10, fontWeight: "700", fontSize: 16, color: "#333" }}>
                     Description:
                   </Text>
                   <Text style={{ color: "#555", lineHeight: 20 }}>
@@ -393,7 +368,19 @@ export default function ProductScanner() {
                   </Text>
                 </View>
 
-                {/* Close button */}
+                {/* Process Image Below Details */}
+                {productDetails.process_image && (
+                  <View style={{ marginTop: 20, alignItems: "center" }}>
+                    <Text style={{ fontFamily: "Montserrat-Regular", fontWeight: "600", marginBottom: 6 }}>
+                      Image of the Process
+                    </Text>
+                    <Image
+                      source={{ uri: productDetails.process_image }}
+                      style={{ width: "100%", height: 200, borderRadius: 12, resizeMode: "contain" }}
+                    />
+                  </View>
+                )}
+
                 <Pressable
                   onPress={() => setModalVisible(false)}
                   style={{
@@ -408,14 +395,12 @@ export default function ProductScanner() {
                     elevation: 5,
                   }}
                 >
-                  <Text
-                    style={{
-                      color: "#fff",
-                      fontSize: 16,
-                      fontWeight: "700",
-                      fontFamily: "Montserrat-Regular",
-                    }}
-                  >
+                  <Text style={{
+                    color: "#fff",
+                    fontSize: 16,
+                    fontWeight: "700",
+                    fontFamily: "Montserrat-Regular",
+                  }}>
                     Close
                   </Text>
                 </Pressable>
@@ -425,7 +410,6 @@ export default function ProductScanner() {
         </View>
       </View>
     </Modal>
-
     </ScrollView>
   );
 }
