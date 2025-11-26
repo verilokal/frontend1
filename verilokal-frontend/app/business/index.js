@@ -12,6 +12,7 @@ import {
   Pressable,
   ScrollView,
   Text,
+  TextInput,
   View,
 } from "react-native";
 
@@ -24,6 +25,9 @@ export default function BusinessDashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isTallImage, setIsTallImage] = useState(false);
+
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -42,9 +46,16 @@ export default function BusinessDashboard() {
     };
     fetchProducts();
   }, []);
-
+  const filteredProducts = products.filter((p) =>
+    p.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
   const openModal = (product) => {
     setSelectedProduct(product);
+    if (product.product_image) {
+    Image.getSize(product.product_image, (width, height) => {
+      setIsTallImage(height > width * 1.2);
+    });
+  }
     setModalVisible(true);
   };
 
@@ -142,7 +153,28 @@ export default function BusinessDashboard() {
         >
           Business Dashboard
         </Text>
-
+        <Text style={{ fontSize: 16, fontFamily: "Montserrat-Regular", marginBottom: 20}}>
+          Total Products: {filteredProducts.length}
+        </Text>
+        <TextInput
+          placeholder="Search products..."
+          placeholderTextColor="#999"
+          style={{
+            width: "100%",
+            paddingVertical: 10,
+            paddingHorizontal: 16,
+            borderWidth: 2,
+            borderColor: "#000",
+            borderRadius: 30,
+            marginBottom: 20,
+            fontFamily: "Montserrat-Regular",
+          }}
+          value={searchQuery}
+          onChangeText={(text) =>{
+            setSearchQuery(text);
+            setVisibleCount(9999);
+          }}
+          />
         {/* REGISTER PRODUCT BUTTON */}
         <Pressable
           style={{
@@ -172,7 +204,7 @@ export default function BusinessDashboard() {
       {/* Product List */}
       <View style={{ width: "100%", maxWidth: 900, alignSelf: "center" }}>
         <FlatList
-          data={products.slice(0, visibleCount)}
+          data={filteredProducts.slice(0, visibleCount)}
           keyExtractor={(item) => item.id}
           scrollEnabled={false}
           contentContainerStyle={{ paddingBottom: 20 }}
@@ -193,9 +225,31 @@ export default function BusinessDashboard() {
                   flexDirection: "row",
                   justifyContent: "space-between",
                   alignItems: "center",
+                  gap: 10,
                 }}
               >
-                <Text style={{ fontWeight: "bold", fontSize: 16 }}>{item.name}</Text>
+                {item.product_image && (
+                  <View 
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 8,
+                    overflow: "hidden",
+                    backgroundColor: "#f0f0f0",
+                  }}
+                  >
+                  <Image
+                  source={{ uri: item.product_image }}
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: 8,
+                    resizeMode: "cover",
+                  }}
+                  />
+                  </View>
+                )}
+                <Text style={{ fontWeight: "bold", fontSize: 16, flex: 1}}>{item.name}</Text>
                 <Pressable
                   onPress={() => openModal(item)}
                   style={{
@@ -249,16 +303,26 @@ export default function BusinessDashboard() {
               <>
                 {/* HEADER IMAGES */}
                 {selectedProduct?.product_image && (
+                  <View
+                  style={{
+                    width: "100%",
+                    aspectRatio: 1.6,
+                    height: 250,
+                    borderRadius: 16,
+                    overflow: "hidden",
+                    backgroundColor: "#f2f2f2",
+                    marginBottom: 15,
+                  }}
+                  >
                   <Image
                     source={{ uri: selectedProduct.product_image }}
                     style={{
                       width: "100%",
-                      height: 200,
-                      borderRadius: 12,
+                      height: "100%",
                       resizeMode: "contain",
-                      marginBottom: 15,
                     }}
                   />
+                  </View>
                 )}
 
                 {/* PRODUCT DETAILS */}
@@ -308,7 +372,7 @@ export default function BusinessDashboard() {
                         style={{
                           width: "100%",
                           height: 200,
-                          borderRadius: 12,
+                          borderRadius: 40,
                           resizeMode: "contain",
                         }}
                       />
@@ -378,7 +442,7 @@ export default function BusinessDashboard() {
                     {selectedProduct?.qr_code && (
                       <Image
                         source={{ uri: selectedProduct.qr_code }}
-                        style={{ width: 130, height: 130, borderRadius: 8 }}
+                        style={{ width: 220, height: 220, borderRadius: 8 }}
                         resizeMode="contain"
                       />
                     )}
