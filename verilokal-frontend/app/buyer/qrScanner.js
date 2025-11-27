@@ -397,7 +397,12 @@ export default function ProductScanner() {
                   style={{ width: "100%", height: 200, borderRadius: 12, resizeMode: "contain" }}
                 />
               )}
-
+              <ScrollView
+              style={{ flexGrow: 1}}
+              contentContainerStyle={{ padding:20, paddingBottom: 40}}
+              showsVerticalScrollIndicator={false}
+              nestedScrollEnabled={true}
+              >
               <View style={{ padding: 20 }}>
                 <Text
                   style={{
@@ -484,6 +489,7 @@ export default function ProductScanner() {
                   </Text>
                 </Pressable>
               </View>
+              </ScrollView>
             </>
           )}
         </View>
