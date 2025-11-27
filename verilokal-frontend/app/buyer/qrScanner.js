@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useFonts } from "expo-font";
-import { useRef, useState } from "react";
-import { Image, Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Dimensions, Image, Modal, Pressable, ScrollView, Text, View } from "react-native";
 
 export default function ProductScanner() {
   const [isScanning, setIsScanning] = useState(false);
@@ -11,6 +11,14 @@ export default function ProductScanner() {
   const [error, setError] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [registered_business_name, setBusinessName] = useState("");
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(Dimensions.get("window").width < 600);
+    handleResize();
+    Dimensions.addEventListener("change", handleResize);
+    return () => Dimensions.removeEventListener("change", handleResize);
+  }, []);
 
   const Html5QrcodeRef = useRef(null);
 
@@ -28,7 +36,7 @@ export default function ProductScanner() {
 
       await qrCodeScanner.start(
         { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
+        { fps: 10, qrbox: { width: 300, height: 300 } }, //
         async (decodedText) => {
           try {
             setQrData(decodedText);
@@ -115,6 +123,15 @@ export default function ProductScanner() {
     );
   }
 
+  const instructions = [
+    "Press START to activate the scanner.",
+    "Allow camera permissions if prompted.",
+    "Point your camera at the QR code.",
+    "Wait for the system to decode automatically.",
+    "Product details will pop up if verification succeeds.",
+    "If scanning fails, reposition the QR or adjust lighting.",
+  ];
+
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: "#FFFFFF" }}
@@ -137,28 +154,90 @@ export default function ProductScanner() {
         Product Verification
       </Text>
 
-      {/* Scanner Box */}
+      {/* Scanner and Instructions Container */}
       <View
-        id="qr-reader"
         style={{
-          width: 250,
-          height: 250,
-          borderWidth: 2,
-          borderColor: "#000",
-          borderRadius: 16,
-          justifyContent: "center",
-          alignItems: "center",
+          flexDirection: isMobile ? "column" : "row",
+          gap: 20,
           marginBottom: 20,
-          backgroundColor: "#f9fafb",
-          shadowColor: "#000",
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 3,
+          alignItems: "center",
         }}
       >
-        <Text style={{ textAlign: "center", color: "#888" }}>
-          {isScanning ? "Scanning..." : "Scanner Inactive"}
-        </Text>
+        {/* Scanner Box */}
+        <View
+          id="qr-reader"
+          style={{
+            width: 300, // Increased from 250 to 300
+            height: 300, // Increased from 250 to 300
+            borderWidth: 2,
+            borderColor: "#000",
+            borderRadius: 16,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#f9fafb",
+            shadowColor: "#000",
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 3,
+          }}
+        >
+          <Text style={{ textAlign: "center", color: "#888" }}>
+            {isScanning ? "Scanning..." : "Scanner Inactive"}
+          </Text>
+        </View>
+
+        {/* Instructions Box */}
+        <View
+          style={{
+            width: 300, // Increased from 250 to 300
+            height: 300, // Increased from 250 to 300
+            borderWidth: 2,
+            borderColor: "#000",
+            borderRadius: 16,
+            backgroundColor: "#f9fafb",
+            shadowColor: "#000",
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 3,
+            padding: 20,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 18,
+              fontFamily: "Garet-Heavy",
+              color: "#000",
+              textAlign: "center",
+              marginBottom: 15,
+            }}
+          >
+            Instructions
+          </Text>
+          <ScrollView
+            style={{ flex: 1 }}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingHorizontal: 10 }}
+          >
+            {instructions.map((instruction, index) => (
+              <View key={index} style={{ flexDirection: "row", marginBottom: 10, alignItems: "flex-start" }}>
+                <Text style={{ fontSize: 16, color: "#e98669", marginRight: 10, fontWeight: "bold" }}>
+                  {index + 1}.
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: "#333",
+                    fontFamily: "Montserrat-Regular",
+                    lineHeight: 20,
+                    flex: 1,
+                  }}
+                >
+                  {instruction}
+                </Text>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
       </View>
 
       {/* Buttons */}
