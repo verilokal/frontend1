@@ -365,136 +365,142 @@ export default function ProductScanner() {
       )}
 
     {/* Modal */}
-    <Modal visible={modalVisible} animationType="fade" transparent>
+      <Modal visible={modalVisible} animationType="fade" transparent>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.6)",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: 10,
+      }}
+    >
       <View
         style={{
-          flex: 1,
-          backgroundColor: "rgba(0,0,0,0.6)",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: 20,
+          width: "92%",
+          maxWidth: 420,
+          maxHeight: "85%", // limit height so modal is scrollable
+          borderRadius: 20,
+          backgroundColor: "rgba(255,255,255,0.97)",
+          shadowColor: "#000",
+          shadowOpacity: 0.2,
+          shadowRadius: 10,
+          elevation: 10,
+          overflow: "hidden",
         }}
       >
-        <View
-          style={{
-            width: "92%",
-            maxWidth: 420,
-            borderRadius: 20,
-            backgroundColor: "rgba(255,255,255,0.97)",
-            shadowColor: "#000",
-            shadowOpacity: 0.2,
-            shadowRadius: 10,
-            elevation: 10,
-            overflow: "hidden",
-          }}
-        >
-          {productDetails && (
-            <>
-              {/* Product Image */}
-              {productDetails.product_image && (
-                <Image
-                  source={{ uri: productDetails.product_image }}
-                  style={{ width: "100%", height: 200, borderRadius: 12, resizeMode: "contain" }}
-                />
-              )}
-              <ScrollView
-              style={{ flexGrow: 1}}
-              contentContainerStyle={{ padding:20, paddingBottom: 40}}
-              showsVerticalScrollIndicator={false}
-              nestedScrollEnabled={true}
+        {productDetails && (
+          <>
+            {/* Product Image */}
+            {productDetails.product_image && (
+              <Image
+                source={{ uri: productDetails.product_image }}
+                style={{ width: "100%", height: 200, borderRadius: 12, resizeMode: "contain" }}
+              />
+            )}
+
+            {/* Scrollable content */}
+            <ScrollView
+              style={{ flex: 1 }}
+              contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+              showsVerticalScrollIndicator={true}
+              nestedScrollEnabled={true} // important for mobile scrolling
+            >
+              <Text
+                style={{
+                  fontSize: 24,
+                  fontFamily: "Garet-Heavy",
+                  marginBottom: 10,
+                  textAlign: "center",
+                  color: "#333",
+                }}
               >
-              <View style={{ padding: 20 }}>
-                <Text
-                  style={{
-                    fontSize: 24,
-                    fontFamily: "Garet-Heavy",
-                    marginBottom: 10,
-                    textAlign: "center",
-                    color: "#333",
-                  }}
-                >
-                  {productDetails.name}
-                </Text>
+                {productDetails.name}
+              </Text>
 
-                <View style={{ height: 1, backgroundColor: "#e0e0e0", marginVertical: 10 }} />
+              <View style={{ height: 1, backgroundColor: "#e0e0e0", marginVertical: 10 }} />
 
-                {/* Registered Artisan */}
-                <Text style={{
+              {/* Registered Artisan */}
+              <Text
+                style={{
                   fontSize: 18,
                   fontFamily: "Montserrat-Regular",
                   marginBottom: 10,
                   color: "#555",
                   textAlign: "center",
-                  fontWeight: "700"
-                }}>
-                  {registered_business_name ? `Registered Artisan: ${registered_business_name}` : ""}
+                  fontWeight: "700",
+                }}
+              >
+                {registered_business_name ? `Registered Artisan: ${registered_business_name}` : ""}
+              </Text>
+
+              <View style={{ gap: 6 }}>
+                <Text style={{ fontSize: 16, color: "#444" }}>
+                  <Text style={{ fontWeight: "700" }}>Type: </Text>{productDetails.type}
+                </Text>
+                <Text style={{ fontSize: 16, color: "#444" }}>
+                  <Text style={{ fontWeight: "700" }}>Materials: </Text>{productDetails.materials}
+                </Text>
+                <Text style={{ fontSize: 16, color: "#444" }}>
+                  <Text style={{ fontWeight: "700" }}>Origin: </Text>{productDetails.origin}
+                </Text>
+                <Text style={{ fontSize: 16, color: "#444" }}>
+                  <Text style={{ fontWeight: "700" }}>Production Date: </Text>{productDetails.productionDate}
                 </Text>
 
-                <View style={{ gap: 6 }}>
-                  <Text style={{ fontSize: 16, color: "#444" }}>
-                    <Text style={{ fontWeight: "700" }}>Type: </Text>{productDetails.type}
-                  </Text>
-                  <Text style={{ fontSize: 16, color: "#444" }}>
-                    <Text style={{ fontWeight: "700" }}>Materials: </Text>{productDetails.materials}
-                  </Text>
-                  <Text style={{ fontSize: 16, color: "#444" }}>
-                    <Text style={{ fontWeight: "700" }}>Origin: </Text>{productDetails.origin}
-                  </Text>
-                  <Text style={{ fontSize: 16, color: "#444" }}>
-                    <Text style={{ fontWeight: "700" }}>Production Date: </Text>{productDetails.productionDate}
-                  </Text>
+                <Text style={{ marginTop: 10, fontWeight: "700", fontSize: 16, color: "#333" }}>
+                  Description:
+                </Text>
+                <Text style={{ color: "#555", lineHeight: 20 }}>
+                  {productDetails.description}
+                </Text>
+              </View>
 
-                  <Text style={{ marginTop: 10, fontWeight: "700", fontSize: 16, color: "#333" }}>
-                    Description:
+              {/* Process Image Below Details */}
+              {productDetails.process_image && (
+                <View style={{ marginTop: 20, alignItems: "center" }}>
+                  <Text style={{ fontFamily: "Montserrat-Regular", fontWeight: "600", marginBottom: 6 }}>
+                    Image of the Process
                   </Text>
-                  <Text style={{ color: "#555", lineHeight: 20 }}>
-                    {productDetails.description}
-                  </Text>
+                  <Image
+                    source={{ uri: productDetails.process_image }}
+                    style={{ width: "100%", height: 200, borderRadius: 12, resizeMode: "contain" }}
+                  />
                 </View>
+              )}
 
-                {/* Process Image Below Details */}
-                {productDetails.process_image && (
-                  <View style={{ marginTop: 20, alignItems: "center" }}>
-                    <Text style={{ fontFamily: "Montserrat-Regular", fontWeight: "600", marginBottom: 6 }}>
-                      Image of the Process
-                    </Text>
-                    <Image
-                      source={{ uri: productDetails.process_image }}
-                      style={{ width: "100%", height: 200, borderRadius: 12, resizeMode: "contain" }}
-                    />
-                  </View>
-                )}
-
-                <Pressable
-                  onPress={() => setModalVisible(false)}
+              <Pressable
+                onPress={() => setModalVisible(false)}
+                style={{
+                  marginTop: 20,
+                  backgroundColor: "#000",
+                  paddingVertical: 14,
+                  borderRadius: 12,
+                  alignItems: "center",
+                  shadowColor: "#000",
+                  shadowOpacity: 0.15,
+                  shadowRadius: 5,
+                  elevation: 5,
+                }}
+              >
+                <Text
                   style={{
-                    marginTop: 20,
-                    backgroundColor: "#000",
-                    paddingVertical: 14,
-                    borderRadius: 12,
-                    alignItems: "center",
-                    shadowColor: "#000",
-                    shadowOpacity: 0.15,
-                    shadowRadius: 5,
-                    elevation: 5,
-                  }}
-                >
-                  <Text style={{
                     color: "#fff",
                     fontSize: 16,
                     fontWeight: "700",
                     fontFamily: "Montserrat-Regular",
-                  }}>
-                    Close
-                  </Text>
-                </Pressable>
-              </View>
-              </ScrollView>
-            </>
-          )}
-        </View>
+                  }}
+                >
+                  Close
+                </Text>
+              </Pressable>
+            </ScrollView>
+          </>
+        )}
       </View>
-    </Modal>
+    </View>
+  </Modal>
+
     </ScrollView>
   );
 }
