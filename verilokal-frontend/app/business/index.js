@@ -28,13 +28,23 @@ export default function BusinessDashboard() {
   const [modalVisible, setModalVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isTallImage, setIsTallImage] = useState(false);
+  const [businessname, setRegisteredBusinessName] = useState(null);
+
+
+  useEffect(() => {
+    const loadBusinessesName = async () => {
+      const registered_business_name = await AsyncStorage.getItem("registered_business_name");
+      if (registered_business_name) setRegisteredBusinessName(registered_business_name);
+    };
+    loadBusinessesName();
+  }, []);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const token = await AsyncStorage.getItem("token");
         const res = await axios.get(
-          "https://backend1-al4l.onrender.com/api/products/my-products",
+          "http://localhost:3000/api/products/my-products",
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setProducts(res.data);
@@ -125,10 +135,44 @@ export default function BusinessDashboard() {
   }
 
   return (
+    
     <ScrollView
       style={{ flex: 1, backgroundColor: "#FFFFFF" }}
       contentContainerStyle={{ alignItems: "center", paddingVertical: 60, paddingHorizontal: 40 }}
     >
+      <View
+        style={{
+          width: "100%",
+          maxWidth: 900,
+          flexDirection: "column",
+          alignItems: isMobile ? "center" : "flex-start",
+          marginBottom: 50,
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 48,  
+            fontFamily: "Garet-Heavy",
+            color: "#000",
+            textAlign: "center",
+            marginBottom: 8,
+          }}
+        >
+          Welcome,{" "}
+          <Text
+            style={{
+              fontSize: 28, 
+              fontFamily: "Garet-Regular",
+              color: "#b04224",
+              textAlign: isMobile ? "center" : "left",
+              marginBottom: 4,
+            }}
+          >
+            {businessname ? businessname : ""}
+          </Text>
+        </Text>
+      </View>
+        
       {/* Header */}
       <View
         style={{
@@ -165,7 +209,7 @@ export default function BusinessDashboard() {
             paddingHorizontal: 16,
             borderWidth: 2,
             borderColor: "#000",
-            borderRadius: 30,
+            borderRadius: 32,
             marginBottom: 20,
             fontFamily: "Montserrat-Regular",
           }}

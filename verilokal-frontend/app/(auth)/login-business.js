@@ -17,7 +17,7 @@ export default function BusinessLogin() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({}); 
+  const [errors, setErrors] = useState({});
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -35,35 +35,31 @@ export default function BusinessLogin() {
 
     if (Object.keys(newErrors).length > 0) return;
 
-    try {
-      // ---------- ADMIN LOGIN ----------
-      const adminRes = await axios.post(
-        "https://backend1-al4l.onrender.com/api/admin/login",
-        qs.stringify({ email, password }),
-        { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
-      );
+    const ADMIN_EMAIL = "admin@verilokal.com";
+    const ADMIN_PASSWORD = "verilokal@2025";
 
-      if (adminRes.data.admin) {
-        await AsyncStorage.setItem("token", adminRes.data.token);
-        Alert.alert("Success", "Admin login successful!");
-        router.replace("/admin"); // redirect to admin dashboard
-        return;
-      }
-    } catch (adminErr) {
-      // Admin login failed, continue to business login
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      await AsyncStorage.setItem("isAdmin", "true");
+      Alert.alert("Success", "Admin login successful!");
+      router.replace("/admin/dashboard");
+      return; 
     }
 
     try {
-      // ---------- BUSINESS LOGIN ----------
       const response = await axios.post(
-        "https://backend1-al4l.onrender.com/api/login",
+        "http://localhost:3000/api/login",
         qs.stringify({ email, password }),
         { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
       );
 
-      await AsyncStorage.setItem("token", response.data.token);
+      const { token, business } = response.data;
+      await AsyncStorage.setItem("token", token);
+      await AsyncStorage.setItem("business_id", business.id.toString());
+      await AsyncStorage.setItem("name", business.name);
+      await AsyncStorage.setItem("registered_business_name", business.registered_business_name);
       Alert.alert("Success", "Business login successful!");
-      router.replace("/business"); // redirect to business dashboard
+      router.replace("/business");
+      
     } catch (error) {
       if (error.response?.status === 404) {
         setErrors({ email: " ", password: "Incorrect Username or Password" });
@@ -87,7 +83,7 @@ export default function BusinessLogin() {
     <View style={{ flex: 1, backgroundColor: "#FFFFFF", justifyContent: "center", alignItems: "center", paddingHorizontal: 20 }}>
       <View
         style={{
-          flexDirection: "row",
+          flexDirection: isMobile ? "column" : "row", // STACK ON MOBILE
           backgroundColor: "#DDDADF",
           borderRadius: 20,
           shadowColor: "#000",
@@ -99,7 +95,7 @@ export default function BusinessLogin() {
           maxWidth: 800,
         }}
       >
-        {/* Left: Logo + Welcome Text */}
+        {/* Left Box */}
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center", padding: 20 }}>
           <View
             style={{
@@ -117,45 +113,53 @@ export default function BusinessLogin() {
               elevation: 3,
             }}
           >
-            <Image source={require("../../assets/images/verilokal_logo.png")} style={{ width: isMobile ? 80: 120, height:isMobile ? 100 : 150, marginBottom: 20 }} />
-            <Text style={{ fontSize:isMobile ? 22: 28, fontWeight: "570", color: "#000", textAlign: "center", fontFamily: "Montserrat-Regular" }}>
-              Welcome{"\n"}to{"\n"}
-              <Text style={{ color: "#b04224", fontWeight: "800", fontFamily: "Montserrat-Bold" }}>VeriLocal</Text>
-            </Text>
+            <Image
+              source={require("../../assets/images/login.png")}
+              style={{ width: isMobile ? 250 : 350, height: isMobile ? 250 : 350, marginBottom: 20 }}
+            />
           </View>
         </View>
 
-        {/* Right: Login Form */}
-        <View style={{ flex: 1, padding: 20, justifyContent: "center", marginLeft: isMobile ? -25: 0 }}>
-          <Text style={{ fontSize: 22, fontWeight: "700", fontFamily: "Montserrat-Bold", color: "#000", marginBottom: isMobile ? 10: 20 }}>Login</Text>
+        {/* Right Form */}
+        <View style={{ flex: 1, padding: 20, justifyContent: "center", marginLeft: isMobile ? 0 : 0 }}>
+          <Text style={{ fontSize: 22, fontWeight: "700", fontFamily: "Montserrat-Bold", color: "#000", marginBottom: isMobile ? 10 : 20 }}>
+            LOGIN
+          </Text>
 
           {/* Email */}
-          <Text style={{ fontSize: 10, marginBottom: 5, fontFamily: "Montserrat-Regular" }}>Email*</Text>
+          <Text style={{ fontSize: 12, marginBottom: 5, fontFamily: "Montserrat-Regular" }}>Email*</Text>
           <TextInput
             placeholder="Enter your email"
             value={email}
-            onChangeText={(text) => { setEmail(text); setErrors(prev => ({ ...prev, email: null })); }}
+            onChangeText={(text) => {
+              setEmail(text);
+              setErrors(prev => ({ ...prev, email: null }));
+            }}
             style={{
               borderWidth: 1,
               borderColor: errors.email ? "#ff4d4d" : "#000",
               borderRadius: 18,
               backgroundColor: "#ffffff",
-              paddingVertical: 10,
+              paddingVertical: isMobile ? 12 : 14,
               paddingHorizontal: 15,
               marginBottom: errors.email ? 4 : 15,
               fontFamily: "Montserrat-Regular",
-              fontSize: isMobile ? 9.5: 12,
+              fontSize: isMobile ? 9.5 : 12,
+              height: isMobile ? 40 : 45,
             }}
           />
           {errors.email && <Text style={{ color: "#ff4d4d", fontSize: 12, marginBottom: 10 }}>{errors.email}</Text>}
 
           {/* Password */}
-          <Text style={{ fontSize: 10, marginBottom: 5, fontFamily: "Montserrat-Regular" }}>Password*</Text>
+          <Text style={{ fontSize: 12, marginBottom: 5, fontFamily: "Montserrat-Regular" }}>Password*</Text>
           <TextInput
             placeholder="Enter your password"
             secureTextEntry
             value={password}
-            onChangeText={(text) => { setPassword(text); setErrors(prev => ({ ...prev, password: null })); }}
+            onChangeText={(text) => {
+              setPassword(text);
+              setErrors(prev => ({ ...prev, password: null }));
+            }}
             style={{
               borderWidth: 1,
               borderColor: errors.password ? "#ff4d4d" : "#000",
@@ -165,7 +169,8 @@ export default function BusinessLogin() {
               paddingHorizontal: 15,
               marginBottom: errors.password ? 4 : 20,
               fontFamily: "Montserrat-Regular",
-              fontSize: isMobile ? 9.5: 12,
+              fontSize: isMobile ? 9.5 : 12,
+              height: isMobile ? 40 : 45,
             }}
           />
           {errors.password && <Text style={{ color: "#ff4d4d", fontSize: 12, marginBottom: 10 }}>{errors.password}</Text>}
@@ -174,7 +179,7 @@ export default function BusinessLogin() {
           <TouchableOpacity
             style={{
               backgroundColor: "#e98669",
-              paddingVertical: isMobile ? 8 :12,
+              paddingVertical: isMobile ? 8 : 12,
               borderRadius: 20,
               alignItems: "center",
               marginBottom: 10,
@@ -182,18 +187,21 @@ export default function BusinessLogin() {
               alignSelf: "center",
               height: 35,
             }}
-            onPress={handleBusinessLogin} // <-- handles both admin & business login
+            onPress={handleBusinessLogin}
           >
-            <Text style={{ color: "#fff", fontWeight: "600", fontSize: isMobile ? 13: 16, top: isMobile ? 0: -6 }}>Login</Text>
+            <Text style={{ color: "#fff", fontWeight: "600", fontSize: isMobile ? 13 : 16, top: isMobile ? 0 : -6, paddingBottom: 20 }}>
+              Login
+            </Text>
           </TouchableOpacity>
 
-          {/* Sign Up Text */}
-          <Text style={{ textAlign: "center", fontFamily: "Montserrat-Regular", fontSize: isMobile ? 13: 16 }}>
+          {/* Sign Up */}
+          <Text style={{ textAlign: "center", fontFamily: "Montserrat-Regular", fontSize: isMobile ? 11 : 13 }}>
             Don’t have an account?{" "}
             <Text style={{ color: "#b04224", fontFamily: "Montserrat-Bold" }} onPress={() => router.push("/business/businessRegistration")}>
               Sign up
             </Text>
           </Text>
+
         </View>
       </View>
     </View>
