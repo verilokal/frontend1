@@ -124,7 +124,7 @@ export default function RegisterProduct() {
       appendFile("certificates", certificates);
       appendFile("logo", logo);
 
-      const response = await axios.post("http://localhost:3000/api/business", formData, {
+      const response = await axios.post("https://backend1-al4l.onrender.com/api/business", formData, {
         headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
       });
 

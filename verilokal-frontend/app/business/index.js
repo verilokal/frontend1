@@ -44,7 +44,7 @@ export default function BusinessDashboard() {
       try {
         const token = await AsyncStorage.getItem("token");
         const res = await axios.get(
-          "http://localhost:3000/api/products/my-products",
+          "https://backend1-al4l.onrender.com/api/products/my-products",
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setProducts(res.data);

@@ -17,7 +17,7 @@ export default function AdminDashboard() {
   const [showModal, setShowModal] = useState(false);
   const [currentImage, setCurrentImage] = useState(null);
 
-  const serverUrl = "http://localhost:3000"; // change if deployed
+  const serverUrl = "https://backend1-al4l.onrender.com"; // change if deployed
 
   // Load pending businesses
   const loadBusinesses = async () => {
