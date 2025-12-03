@@ -31,6 +31,7 @@ export default function RegisterProduct() {
   const [errors, setErrors] = useState({});
   const [statusType, setStatusType] = useState("success");
   const [consent, setConsent] = useState(false);
+  const [showConsentModal, setShowConsentModal] = useState(false);
 
   const pickImage = async (setState) => {
     try {
@@ -72,8 +73,7 @@ export default function RegisterProduct() {
     return () => Dimensions.removeEventListener("change", handleResize);
   }, []);
 
-  const handleSubmit = async () => {
-    setErrors({});
+  const handleRegisterClick = () => {
     const newErrors = {};
     if (!name) newErrors.name = "Owner name is required!";
     if (!address) newErrors.address = "Address is required!";
@@ -86,11 +86,28 @@ export default function RegisterProduct() {
     if (!contact_no) newErrors.contact_no = "Contact Number is required!";
     if (contact_no && contact_no.length !== 11) newErrors.contact_no = "Contact number must be 11 digits!";
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = "Please enter a valid email address!";
-    if (!consent) newErrors.consent = "You must give consent to proceed!";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       setStatusMessage("Please fix the errors above.");
+      setStatusType("error");
+      return;
+    }
+
+    setShowConsentModal(true);
+  };
+
+  const handleConfirmConsent = () => {
+    setConsent(true);
+    setShowConsentModal(false);
+    handleSubmit(); 
+  };
+
+  const handleSubmit = async () => {
+    setErrors({});
+    if (!consent) {
+      setErrors({ consent: "You must give consent to proceed!" });
+      setStatusMessage("Please provide consent to proceed.");
       setStatusType("error");
       return;
     }
@@ -131,6 +148,7 @@ export default function RegisterProduct() {
       Alert.alert("Success", "Business registered successfully!");
       setStatusMessage("✅ Business Submitted, Wait for the confirmation on your email account!");
       setStatusType("success");
+
       setOwnerName(""); setAddress(""); setRegisteredBusinessName("");
       setDescription(""); setProductImage(null); setCertificates(null); setBusinessLogo(null);
       setEmail(""); setPassword(""); setContactNo(""); setErrors({}); setConsent(false);
@@ -155,180 +173,131 @@ export default function RegisterProduct() {
   if (!fontsLoaded) return <View><Text>Loading fonts...</Text></View>;
 
   return (
-    <ScrollView style={styles.container(isMobile)} contentContainerStyle={styles.scrollContainer(isMobile)}>
-      <Text style={styles.title(isMobile)}>Register Business</Text>
-      <View style={{ flexDirection: isMobile ? "column" :"row", justifyContent: "space-between", flexWrap: "wrap", gap: 40 }}>
-
+    <ScrollView style={styles.container} contentContainerStyle={[styles.scrollContainer, { paddingHorizontal: isMobile ? 20 : 70 }]}>
+      <Text style={[styles.title, { fontSize: isMobile ? 28 : 40 }]}>Register Business</Text>
+      
+      <View style={{ flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", gap: 20 }}>
         {/* LEFT COLUMN */}
         <View style={{ flex: 1 }}>
-          {/** Owner Name */}
           <Text style={styles.label}>OWNER NAME*</Text>
-          <TextInput
-            placeholder="Name of the Owner"
-            value={name}
-            onChangeText={setOwnerName}
-            style={styles.input(isMobile, !!errors.name)}
-          />
+          <TextInput placeholder="Name of the Owner" value={name} onChangeText={setOwnerName} style={[styles.input, errors.name && { borderColor: "red" }]} />
           {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
-          {/** Address */}
           <Text style={styles.label}>ADDRESS*</Text>
-          <TextInput
-            placeholder="Address"
-            value={address}
-            onChangeText={setAddress}
-            style={styles.input(isMobile, !!errors.address)}
-          />
+          <TextInput placeholder="Address" value={address} onChangeText={setAddress} style={[styles.input, errors.address && { borderColor: "red" }]} />
           {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
 
-          {/** Business Name */}
           <Text style={styles.label}>BUSINESS NAME*</Text>
-          <TextInput
-            placeholder="Your DTI Registered Business Name"
-            value={business_name}
-            onChangeText={setRegisteredBusinessName}
-            style={styles.input(isMobile, !!errors.business_name)}
-          />
+          <TextInput placeholder="Your DTI Registered Business Name" value={business_name} onChangeText={setRegisteredBusinessName} style={[styles.input, errors.business_name && { borderColor: "red" }]} />
           {errors.business_name && <Text style={styles.errorText}>{errors.business_name}</Text>}
 
-
-          {/** Email */}
           <Text style={styles.label}>EMAIL*</Text>
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input(isMobile, !!errors.email)}
-          />
+          <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={[styles.input, errors.email && { borderColor: "red" }]} />
           {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
-          {/** Password */}
           <Text style={styles.label}>PASSWORD*</Text>
           <View style={styles.passwordWrapper}>
-            <TextInput
-              placeholder="Password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!show}
-              style={styles.passwordInput(isMobile, !!errors.password)}
-            />
+            <TextInput placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry={!show} style={[styles.passwordInput, errors.password && { borderColor: "red" }]} />
             <Pressable style={styles.showButton} onPress={() => setShow(!show)}>
               <Text style={styles.showButtonText}>{show ? "Hide" : "Show"}</Text>
             </Pressable>
           </View>
           {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
-          {/** Contact Number */}
           <Text style={styles.label}>CONTACT NUMBER*</Text>
-          <TextInput
-            placeholder="Contact Number"
-            value={contact_no}
-            keyboardType="numeric"
-            maxLength={11}
-            onChangeText={(text) => setContactNo(text.replace(/[^0-9]/g, ""))}
-            style={styles.input(isMobile, !!errors.contact_no)}
-          />
+          <TextInput placeholder="Contact Number" value={contact_no} keyboardType="numeric" maxLength={11} onChangeText={(text) => setContactNo(text.replace(/[^0-9]/g, ""))} style={[styles.input, errors.contact_no && { borderColor: "red" }]} />
           {errors.contact_no && <Text style={styles.errorText}>{errors.contact_no}</Text>}
         </View>
 
         {/* RIGHT COLUMN */}
-        <View style={{ flex: 1, top: isMobile ? -250 : 0 }}>
-          {/** Description */}
+        <View style={{ flex: 1, marginTop: isMobile ? -180 : 0}}>
           <Text style={styles.label}>DESCRIPTION*</Text>
-          <TextInput
-            placeholder="Description"
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            style={[styles.input(isMobile, !!errors.description), { height: isMobile ? 300 : 125, textAlignVertical: "top" }]}
-          />
+          <TextInput placeholder="Description" value={description} onChangeText={setDescription} multiline style={[styles.input, { height: isMobile ? 300 : 125, textAlignVertical: "bottom", }, errors.description && { borderColor: "red" }]} />
           {errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
 
-          {/** Product Image */}
-            <Text style={styles.label}>CERTIFICATE*</Text>
-            <Pressable
-              onPress={() => pickImage(setProductImage)}
-              style={[styles.uploadBox(isMobile), !!errors.product_img && { borderColor: "red" }]}
-            >
-              <Text style={{ fontSize: 26 }}>📷</Text>
-              {!product_img && <Text style={styles.uploadText}>Upload Certificate</Text>}
-              {product_img && <Text style={styles.uploadedText}>Uploaded: {product_img.name}</Text>}
-            </Pressable>
-            {errors.product_img && <Text style={[styles.errorText, { marginTop: -15, marginBottom: 20 }]}>{errors.product_img}</Text>}
-
-            {/** Business Permit/Mayor's Permit */}
-            <Text style={styles.label}>BUSINESS PERMIT*</Text>
-            <Pressable
-              onPress={() => pickImage(setCertificates)}
-              style={[styles.uploadBox(isMobile), !!errors.certificates && { borderColor: "red" }]}
-            >
-              <Text style={{ fontSize: 26 }}>📜</Text>
-              {!certificates && <Text style={styles.uploadText}>Upload Business Permit</Text>}
-              {certificates && <Text style={styles.uploadedText}>Uploaded: {certificates.name}</Text>}
-            </Pressable>
-            {errors.certificates && <Text style={[styles.errorText, { marginTop: -15, marginBottom: 20 }]}>{errors.certificates}</Text>}
-
-            {/** Business Logo */}
-            <Text style={styles.label}>BUSINESS LOGO (Optional)</Text>
-            <Pressable
-              onPress={() => pickImage(setBusinessLogo)}
-              style={[styles.uploadBox(isMobile), !!errors.logo && { borderColor: "red" }]}
-            >
-              <Text style={{ fontSize: 26 }}>🏢</Text>
-              {!logo && <Text style={styles.uploadText}>Upload Business Logo</Text>}
-              {logo && <Text style={styles.uploadedText}>Uploaded: {logo.name}</Text>}
-            </Pressable>
-            {errors.logo && <Text style={[styles.errorText, { marginTop: -15, marginBottom: 20 }]}>{errors.logo}</Text>}
-
-
-          {/** Consent */}
-          <Pressable style={styles.consentRow} onPress={() => setConsent(!consent)}>
-            <View style={[styles.checkbox, consent && styles.checkboxChecked]}>
-              {consent && <Text style={styles.checkmark}>✔</Text>}
-            </View>
-            <Text style={{ flex: 1, fontFamily: "Montserrat-Regular" }}>
-              I consent to the collection and processing of my personal data for verification purposes.
-            </Text>
+          <Text style={styles.label}>CERTIFICATE*</Text>
+          <Pressable onPress={() => pickImage(setProductImage)} style={[styles.uploadBox, errors.product_img && { borderColor: "red" }]}>
+            <Text style={{ fontSize: 26 }}>📷</Text>
+            {!product_img ? <Text style={styles.uploadText}>Upload Certificate</Text> : <Text style={styles.uploadedText}>Uploaded: {product_img.name}</Text>}
           </Pressable>
+          {errors.product_img && <Text style={styles.errorText}>{errors.product_img}</Text>}
 
-          {errors.consent && <Text style={styles.errorText}>{errors.consent}</Text>}
+          <Text style={styles.label}>BUSINESS PERMIT*</Text>
+          <Pressable onPress={() => pickImage(setCertificates)} style={[styles.uploadBox, errors.certificates && { borderColor: "red" }]}>
+            <Text style={{ fontSize: 26 }}>📜</Text>
+            {!certificates ? <Text style={styles.uploadText}>Upload Business Permit</Text> : <Text style={styles.uploadedText}>Uploaded: {certificates.name}</Text>}
+          </Pressable>
+          {errors.certificates && <Text style={styles.errorText}>{errors.certificates}</Text>}
 
-          <Pressable onPress={handleSubmit} style={styles.submitButton(isMobile)}>
-            <Text style={styles.submitText}>Submit Product</Text>
+          <Text style={styles.label}>BUSINESS LOGO (Optional)</Text>
+          <Pressable onPress={() => pickImage(setBusinessLogo)} style={[styles.uploadBox, errors.logo && { borderColor: "red" }]}>
+            <Text style={{ fontSize: 26 }}>🏢</Text>
+            {!logo ? <Text style={styles.uploadText}>Upload Business Logo</Text> : <Text style={styles.uploadedText}>Uploaded: {logo.name}</Text>}
+          </Pressable>
+          {errors.logo && <Text style={styles.errorText}>{errors.logo}</Text>}
+
+          <Pressable onPress={handleRegisterClick} style={styles.submitButton}>
+            <Text style={styles.submitText}>Register</Text>
           </Pressable>
         </View>
       </View>
 
       {statusMessage ? (
-        <Text style={[styles.statusMessage(isMobile), statusType === "success" ? styles.successMessage : styles.errorMessage]}>
+        <Text style={[styles.statusMessage, statusType === "success" ? styles.successMessage : styles.errorMessage]}>
           {statusMessage}
         </Text>
       ) : null}
+
+      {/* Consent Modal */}
+      {showConsentModal && (
+        <View style={{
+          position: "absolute",
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: "rgba(0,0,0,0.5)",
+          justifyContent: isMobile ? "flex-end" : "center",
+          alignItems: "center",
+          padding: 20,
+        }}>
+          <View style={{
+            backgroundColor: "#fff",
+            padding: 20,
+            borderRadius: 16,
+            width: "100%",
+            maxWidth: 400,
+          }}>
+            <Text style={{ fontFamily: "Montserrat-Regular", fontSize: 16, marginBottom: 20 }}>
+              By submitting this business registration, you consent to the collection and processing of your personal data for verification purposes.
+            </Text>
+            <Pressable onPress={handleConfirmConsent} style={{ backgroundColor: "#e98669", padding: 12, borderRadius: 10, marginBottom: 10 }}>
+              <Text style={{ fontFamily: "Montserrat-Regular", fontWeight: "700", textAlign: "center" }}>I Agree / Confirm</Text>
+            </Pressable>
+            <Pressable onPress={() => setShowConsentModal(false)} style={{ padding: 12 }}>
+              <Text style={{ fontFamily: "Montserrat-Regular", textAlign: "center", color: "#444" }}>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: (isMobile) => ({ flex: 1, backgroundColor: "#FFFFFF" }),
-  scrollContainer: (isMobile) => ({ paddingVertical: isMobile ? 16 : 24, paddingHorizontal: isMobile ? 30 : 70 }),
-  title: (isMobile) => ({ fontSize: isMobile ? 30 : 40, marginBottom: 20, fontWeight: "bold", fontFamily: "Garet-Heavy" }),
+  container: { flex: 1, backgroundColor: "#FFFFFF" },
+  scrollContainer: { paddingVertical: 24 },
+  title: { marginBottom: 20, fontWeight: "bold", fontFamily: "Garet-Heavy" },
   label: { fontSize: 14, fontWeight: "700", fontFamily: "Montserrat-Regular", marginBottom: 6 },
-  input: (isMobile, hasError) => ({ borderWidth: 1, borderColor: hasError ? "red" : "#000", borderRadius: 12, paddingVertical: 10, paddingHorizontal: 14, marginBottom: 8, backgroundColor: "#FFFFFF", fontFamily: "Montserrat-Regular", fontSize: 13 }),
+  input: { borderWidth: 1, borderColor: "#000", borderRadius: 12, paddingVertical: 10, paddingHorizontal: 14, marginBottom: 8, backgroundColor: "#FFFFFF", fontFamily: "Montserrat-Regular", fontSize: 13 },
   errorText: { color: "red", fontSize: 12, marginTop: 1, marginBottom: 8, fontFamily: "Montserrat-Regular" },
-  uploadBox: (isMobile) => ({ borderWidth: 1.5, borderStyle: "dashed", borderColor: "#999", borderRadius: 10, paddingVertical: isMobile ? 20 : 30, alignItems: "center", marginBottom: 20, backgroundColor: "#fafafa", height: isMobile ? 100 : 125, justifyContent: "center",}),
+  uploadBox: { borderWidth: 1.5, borderStyle: "dashed", borderColor: "#999", borderRadius: 10, paddingVertical: 20, alignItems: "center", marginBottom: 20, backgroundColor: "#fafafa", justifyContent: "center" },
   uploadText: { fontSize: 16, fontWeight: "600", color: "#444" },
   uploadedText: { fontWeight: "600", textAlign: "center", marginBottom: 0, fontFamily: "Montserrat-Regular", color: "#0A84FF" },
-  consentRow: { flexDirection: "row", alignItems: "center", marginBottom: 6 },
-  checkbox: { width: 20, height: 20, borderWidth: 1, borderColor: "#444", borderRadius: 4, marginRight: 8, justifyContent: "center", alignItems: "center", backgroundColor: "#fff" },
-  checkboxChecked: { backgroundColor: "#0A84FF" },
-  checkmark: { color: "#fff", fontWeight: "bold" },
-  submitButton: (isMobile) => ({ backgroundColor: "#e98669", paddingVertical: 14, borderRadius: 20, alignSelf: "center", width: 160, marginTop: 10 }),
+  submitButton: { backgroundColor: "#e98669", paddingVertical: 14, borderRadius: 20, alignSelf: "center", width: 160, marginTop: 10 },
   submitText: { color: "#000", fontWeight: "700", fontFamily: "Montserrat-Regular", textAlign: "center", letterSpacing: 1 },
-  statusMessage: (isMobile) => ({ padding: 10, borderRadius: 8, textAlign: "center", fontWeight: "600", marginTop: isMobile ? -235 : 20 }),
+  statusMessage: { padding: 10, borderRadius: 8, textAlign: "center", fontWeight: "600", marginTop: 20 },
   successMessage: { backgroundColor: "#d4edda", color: "#155724", fontFamily: "Montserrat-Regular" },
   errorMessage: { backgroundColor: "#f8d7da", color: "#721c24", fontFamily: "Montserrat-Regular" },
   passwordWrapper: { position: "relative", width: "100%", justifyContent: "center" },
-  passwordInput: (isMobile, hasError) => ({ borderWidth: 1, borderColor: hasError ? "red" : "#000", borderRadius: 12, paddingVertical: 10, paddingHorizontal: 14, marginBottom: 10, backgroundColor: "#FFFFFF", fontFamily: "Montserrat-Regular", fontSize: 13, paddingRight: 70 }),
+  passwordInput: { borderWidth: 1, borderColor: "#000", borderRadius: 12, paddingVertical: 10, paddingHorizontal: 14, marginBottom: 10, backgroundColor: "#FFFFFF", fontFamily: "Montserrat-Regular", fontSize: 13, paddingRight: 70 },
   showButton: { position: "absolute", right: 14, padding: 4, top: 7 },
   showButtonText: { fontFamily: "Montserrat-Regular", fontSize: 14, color: "#444" },
 });

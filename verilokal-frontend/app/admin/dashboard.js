@@ -17,9 +17,8 @@ export default function AdminDashboard() {
   const [showModal, setShowModal] = useState(false);
   const [currentImage, setCurrentImage] = useState(null);
 
-  const serverUrl = "https://backend1-al4l.onrender.com"; // change if deployed
+  const serverUrl = "https://backend1-al4l.onrender.com";
 
-  // Load pending businesses
   const loadBusinesses = async () => {
     try {
       const res = await axios.get(`${serverUrl}/api/admin/pending-businesses`);
@@ -34,7 +33,6 @@ export default function AdminDashboard() {
     loadBusinesses();
   }, []);
 
-  // Verify handler
   const handleVerify = async (id) => {
     try {
       await axios.put(`${serverUrl}/api/admin/verify/${id}`);
@@ -46,58 +44,116 @@ export default function AdminDashboard() {
     }
   };
 
-  // Show image modal
   const showImage = (imgPath) => {
     if (!imgPath) return;
-    const fullUrl = `${serverUrl}/${imgPath}`; // prepend server URL
+
+    const fullUrl = imgPath.startsWith("http")
+      ? imgPath
+      : `${serverUrl}/${imgPath}`;
+
     setCurrentImage(fullUrl);
     setShowModal(true);
   };
 
   return (
-    <View style={{ flex: 1, padding: 20, backgroundColor: "#f7f7f7" }}>
-      <Text style={{ fontSize: 28, fontWeight: "700", marginBottom: 20 }}>
+    <View style={{ flex: 1, padding: 22, backgroundColor: "#F5F5F7" }}>
+      
+      {/* Title */}
+      <Text
+        style={{
+          fontSize: 32,
+          fontWeight: "800",
+          marginBottom: 10,
+          color: "#333",
+        }}
+      >
         Admin Dashboard
       </Text>
 
-      <Text style={{ fontSize: 20, fontWeight: "600", marginBottom: 10 }}>
+      <Text
+        style={{
+          fontSize: 22,
+          fontWeight: "600",
+          marginBottom: 15,
+          color: "#555",
+        }}
+      >
         Pending Business Accounts
       </Text>
 
-      <ScrollView horizontal style={{ marginTop: 10 }}>
+      <ScrollView horizontal>
         <View>
           {/* Table Header */}
           <View
             style={{
               flexDirection: "row",
-              backgroundColor: "#e0e0e0",
-              paddingVertical: 10,
-              paddingHorizontal: 5,
-              minWidth: 1200,
+              backgroundColor: "#D9D9D9",
+              paddingVertical: 14,
+              paddingHorizontal: 10,
+              minWidth: 1400,
+              borderRadius: 8,
             }}
           >
-            <Text style={{ flex: 1, fontWeight: "700" }}>Name</Text>
-            <Text style={{ flex: 1, fontWeight: "700" }}>Address</Text>
-            <Text style={{ flex: 1, fontWeight: "700" }}>Registered Name</Text>
-            <Text style={{ flex: 2, fontWeight: "700" }}>Description</Text>
-            <Text style={{ flex: 1, fontWeight: "700", textAlign: "center" }}>
+            <Text style={{ flex: 1.2, fontWeight: "800" }}>Name</Text>
+            <Text style={{ flex: 1.2, fontWeight: "800" }}>Address</Text>
+            <Text style={{ flex: 1.2, fontWeight: "800" }}>
+              Registered Name
+            </Text>
+            <Text style={{ flex: 2, fontWeight: "800" }}>Description</Text>
+
+            <Text
+              style={{
+                flex: 1,
+                fontWeight: "800",
+                textAlign: "center",
+              }}
+            >
               Product Image
             </Text>
-            <Text style={{ flex: 1, fontWeight: "700", textAlign: "center" }}>
+
+            <Text
+              style={{
+                flex: 1,
+                fontWeight: "800",
+                textAlign: "center",
+              }}
+            >
               Certificates
             </Text>
-            <Text style={{ flex: 1, fontWeight: "700", textAlign: "center" }}>
+
+            <Text
+              style={{
+                flex: 1,
+                fontWeight: "800",
+                textAlign: "center",
+              }}
+            >
               Logo
             </Text>
-            <Text style={{ flex: 1, fontWeight: "700" }}>Contact No</Text>
-            <Text style={{ flex: 0.8, fontWeight: "700", textAlign: "center" }}>
+
+            <Text style={{ flex: 1.1, fontWeight: "800" }}>Contact No</Text>
+
+            <Text
+              style={{
+                flex: 0.9,
+                fontWeight: "800",
+                textAlign: "center",
+              }}
+            >
               Action
             </Text>
           </View>
 
           {/* Table Rows */}
           {pendingBusinesses.length === 0 ? (
-            <Text style={{ fontSize: 16, color: "#888", marginTop: 10 }}>
+            <Text
+              style={{
+                marginTop: 20,
+                fontSize: 18,
+                color: "#888",
+                fontStyle: "italic",
+              }}
+            >
               No pending businesses
             </Text>
           ) : (
@@ -106,18 +162,18 @@ export default function AdminDashboard() {
                 key={b.id}
                 style={{
                   flexDirection: "row",
-                  paddingVertical: 12,
-                  paddingHorizontal: 5,
+                  paddingVertical: 16,
+                  paddingHorizontal: 10,
+                  minWidth: 1400,
+                  backgroundColor: "#FFFFFF",
                   borderBottomWidth: 1,
-                  borderBottomColor: "#eee",
+                  borderBottomColor: "#E0E0E0",
                   alignItems: "center",
-                  minWidth: 1200,
-                  backgroundColor: "#fff",
                 }}
               >
-                <Text style={{ flex: 1 }}>{b.name}</Text>
-                <Text style={{ flex: 1 }}>{b.address}</Text>
-                <Text style={{ flex: 1 }}>{b.registered_business_name}</Text>
+                <Text style={{ flex: 1.2 }}>{b.name}</Text>
+                <Text style={{ flex: 1.2 }}>{b.address}</Text>
+                <Text style={{ flex: 1.2 }}>{b.registered_business_name}</Text>
                 <Text style={{ flex: 2 }}>{b.description}</Text>
 
                 {/* Product Image */}
@@ -126,14 +182,14 @@ export default function AdminDashboard() {
                     <TouchableOpacity
                       onPress={() => showImage(b.product_img)}
                       style={{
-                        backgroundColor: "#4CAF50",
-                        paddingVertical: 4,
-                        paddingHorizontal: 6,
-                        borderRadius: 4,
+                        backgroundColor: "#146C94",
+                        paddingVertical: 6,
+                        paddingHorizontal: 10,
+                        borderRadius: 6,
                       }}
                     >
-                      <Text style={{ color: "#fff", fontWeight: "700" }}>
-                        Show
+                      <Text style={{ color: "white", fontWeight: "700" }}>
+                        View
                       </Text>
                     </TouchableOpacity>
                   ) : (
@@ -147,14 +203,14 @@ export default function AdminDashboard() {
                     <TouchableOpacity
                       onPress={() => showImage(b.certificates)}
                       style={{
-                        backgroundColor: "#4CAF50",
-                        paddingVertical: 4,
-                        paddingHorizontal: 6,
-                        borderRadius: 4,
+                        backgroundColor: "#146C94",
+                        paddingVertical: 6,
+                        paddingHorizontal: 10,
+                        borderRadius: 6,
                       }}
                     >
-                      <Text style={{ color: "#fff", fontWeight: "700" }}>
-                        Show
+                      <Text style={{ color: "white", fontWeight: "700" }}>
+                        View
                       </Text>
                     </TouchableOpacity>
                   ) : (
@@ -168,14 +224,14 @@ export default function AdminDashboard() {
                     <TouchableOpacity
                       onPress={() => showImage(b.logo)}
                       style={{
-                        backgroundColor: "#4CAF50",
-                        paddingVertical: 4,
-                        paddingHorizontal: 6,
-                        borderRadius: 4,
+                        backgroundColor: "#146C94",
+                        paddingVertical: 6,
+                        paddingHorizontal: 10,
+                        borderRadius: 6,
                       }}
                     >
-                      <Text style={{ color: "#fff", fontWeight: "700" }}>
-                        Show
+                      <Text style={{ color: "white", fontWeight: "700" }}>
+                        View
                       </Text>
                     </TouchableOpacity>
                   ) : (
@@ -183,20 +239,22 @@ export default function AdminDashboard() {
                   )}
                 </View>
 
-                <Text style={{ flex: 1 }}>{b.contact_no}</Text>
+                <Text style={{ flex: 1.1 }}>{b.contact_no}</Text>
 
-                {/* Verify button */}
+                {/* Verify Button */}
                 <TouchableOpacity
                   onPress={() => handleVerify(b.id)}
                   style={{
-                    flex: 0.8,
+                    flex: 0.9,
                     backgroundColor: "#FF8C00",
-                    paddingVertical: 6,
-                    borderRadius: 6,
+                    paddingVertical: 8,
+                    borderRadius: 8,
                     alignItems: "center",
                   }}
                 >
-                  <Text style={{ color: "#fff", fontWeight: "700" }}>Verify</Text>
+                  <Text style={{ color: "white", fontWeight: "700" }}>
+                    Verify
+                  </Text>
                 </TouchableOpacity>
               </View>
             ))
@@ -205,34 +263,39 @@ export default function AdminDashboard() {
       </ScrollView>
 
       {/* Image Modal */}
-      <Modal visible={showModal} transparent={true}>
+      <Modal visible={showModal} transparent>
         <View
           style={{
             flex: 1,
-            backgroundColor: "rgba(0,0,0,0.8)",
+            backgroundColor: "rgba(0,0,0,0.85)",
             justifyContent: "center",
             alignItems: "center",
+            padding: 20,
           }}
         >
           <Image
             source={{ uri: currentImage }}
             style={{
-              width: Dimensions.get("window").width * 0.8,
-              height: Dimensions.get("window").height * 0.6,
+              width: Dimensions.get("window").width * 0.9,
+              height: Dimensions.get("window").height * 0.75,
               resizeMode: "contain",
+              borderRadius: 12,
             }}
           />
+
           <Pressable
             onPress={() => setShowModal(false)}
             style={{
-              marginTop: 20,
-              paddingVertical: 10,
-              paddingHorizontal: 20,
-              backgroundColor: "#FF4444",
-              borderRadius: 6,
+              marginTop: 25,
+              paddingVertical: 12,
+              paddingHorizontal: 30,
+              backgroundColor: "#D9534F",
+              borderRadius: 10,
             }}
           >
-            <Text style={{ color: "#fff", fontWeight: "700" }}>Close</Text>
+            <Text style={{ color: "white", fontWeight: "700", fontSize: 16 }}>
+              Close
+            </Text>
           </Pressable>
         </View>
       </Modal>
