@@ -46,8 +46,8 @@ export default function Home() {
           <Image
             source={require("../assets/images/verilokal_logo.png")}
             style={{
-              width: width < 500 ? 120 : 160,
-              height: width < 500 ? 150 : 200,
+              width: width < 550 ? 145 : 180,
+              height: width < 550 ? 185 : 220,
               marginBottom: 25,
             }}
           />
@@ -55,31 +55,42 @@ export default function Home() {
           {/* Headlines */}
           <Text
             style={{
-              fontSize: width < 500 ? 35 : 65,
+              fontSize: width < 500 ? 30 : 50,
               fontFamily: "Garet-Book",
               fontWeight: "bold",
               textAlign: "center",
               color: "#000000",
             }}
           >
-            Preserving what is
+            Preserving what
           </Text>
+          <Text
+            style={{
+              fontSize: width < 400 ? 25 : 45,
+              fontFamily: "Garet-Book",
+              fontWeight: "bold",
+              textAlign: "center",
+              color: "#000000",
+              marginBottom: 15,
+            }}
+          >
+            is{" "}
 
           <Text
             style={{
               fontSize: width < 500 ? 35 : 65,
               fontFamily: "Garet-Heavy",
               textAlign: "center",
-              color: "#d6461f",
+              color: "#5177b0",
               marginBottom: 15,
             }}
           >
             TRUE,
           </Text>
-
+        </Text>   
           <Text
             style={{
-              fontSize: width < 500 ? 35 : 65,
+              fontSize: width < 500 ? 30 : 50,
               fontFamily: "Garet-Book",
               fontWeight: "bold",
               textAlign: "center",
@@ -87,11 +98,10 @@ export default function Home() {
             }}
           >
             Empowering what
-          </Text>
-
+          </Text>   
           <Text
             style={{
-              fontSize: width < 500 ? 35 : 65,
+              fontSize: width < 400 ? 25 : 45,
               fontFamily: "Garet-Book",
               fontWeight: "bold",
               textAlign: "center",
@@ -104,7 +114,7 @@ export default function Home() {
               style={{
                 fontFamily: "Garet-Heavy",
                 fontSize: width < 500 ? 35 : 65,
-                color: "#d6461f",
+                color: "#5177b0",
               }}
             >
               OURS.

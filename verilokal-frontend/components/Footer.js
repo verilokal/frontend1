@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   linkText: {
-    color: "#d6461f",
+    color: "#5177b0",
     fontSize: 14,
     fontFamily: "Montserrat-Regular",
   },

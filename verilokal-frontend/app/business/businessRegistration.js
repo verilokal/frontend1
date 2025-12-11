@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import {
   Alert,
   Dimensions,
+  Image,
   Platform,
   Pressable,
   ScrollView,
@@ -15,121 +16,125 @@ import {
   View,
 } from "react-native";
 
-export default function RegisterProduct() {
-  const [name, setOwnerName] = useState("");
+export default function RegisterBusiness() {
+  const [name, setName] = useState("");
   const [address, setAddress] = useState("");
-  const [business_name, setRegisteredBusinessName] = useState("");
+  const [business_name, setBusinessName] = useState("");
   const [description, setDescription] = useState("");
   const [product_img, setProductImage] = useState(null);
   const [certificates, setCertificates] = useState(null);
-  const [logo, setBusinessLogo] = useState(null);
+  const [logo, setLogo] = useState(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [contact_no, setContactNo] = useState("");
-  const [show, setShow] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
+  const [statusType, setStatusType] = useState("");
   const [errors, setErrors] = useState({});
-  const [statusType, setStatusType] = useState("success");
+  const [isMobile, setIsMobile] = useState(false);
   const [consent, setConsent] = useState(false);
   const [showConsentModal, setShowConsentModal] = useState(false);
 
-  const pickImage = async (setState) => {
+  const pickImage = async (setter) => {
     try {
       if (Platform.OS === "web") {
         const input = document.createElement("input");
         input.type = "file";
         input.accept = "image/*";
-        input.onchange = (event) => {
-          const file = event.target.files[0];
+        input.onchange = (e) => {
+          const file = e.target.files[0];
           if (file) {
-            setState({ uri: URL.createObjectURL(file), file, name: file.name, type: file.type });
+            setter({
+              file,
+              uri: URL.createObjectURL(file),
+              name: file.name,
+              type: file.type,
+            });
           }
         };
         input.click();
       } else {
         const result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.Images,
-          allowsEditing: true,
-          aspect: [4, 3],
           quality: 1,
         });
         if (!result.canceled) {
-          const file = result.assets[0];
-          setState({ uri: file.uri, name: file.fileName || "photo.jpg", type: file.mimeType || "image/jpeg" });
+          const f = result.assets[0];
+          setter({
+            uri: f.uri,
+            name: f.fileName || "image.jpg",
+            type: f.mimeType || "image/jpeg",
+          });
         }
       }
-    } catch (err) {
-      console.error(err);
-      Alert.alert("Error", "Could not pick image.");
+    } catch {
+      Alert.alert("Error", "Image picking failed");
     }
   };
 
-  const [isMobile, setIsMobile] = useState(false);
-
   useEffect(() => {
-    const handleResize = () => setIsMobile(Dimensions.get("window").width < 600);
-    handleResize();
-    Dimensions.addEventListener("change", handleResize);
-    return () => Dimensions.removeEventListener("change", handleResize);
+    const resize = () => {
+      const w = Dimensions.get("window").width;
+      setIsMobile(w < 768);
+    };
+    resize();
+    Dimensions.addEventListener("change", resize);
+    return () => Dimensions.removeEventListener("change", resize);
   }, []);
 
-  const handleRegisterClick = () => {
-    const newErrors = {};
-    if (!name) newErrors.name = "Owner name is required!";
-    if (!address) newErrors.address = "Address is required!";
-    if (!business_name) newErrors.business_name = "Business name is required!";
-    if (!description) newErrors.description = "Description is required!";
-    if (!product_img) newErrors.product_img = "Certificate is required!";
-    if (!certificates) newErrors.certificates = "Business Permit is required!";
-    if (!email) newErrors.email = "Email is required!";
-    if (!password) newErrors.password = "Password is required!";
-    if (!contact_no) newErrors.contact_no = "Contact Number is required!";
-    if (contact_no && contact_no.length !== 11) newErrors.contact_no = "Contact number must be 11 digits!";
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) newErrors.email = "Please enter a valid email address!";
+  const validate = () => {
+    const e = {};
+    if (!name) e.name = "Owner name is required";
+    if (!business_name) e.business_name = "Business name is required";
+    if (!email) e.email = "Email is required";
+    if (!password) e.password = "Password is required";
+    if (!address) e.address = "Address is required";
+    if (!contact_no) e.contact_no = "Contact number is required";
+    if (!description) e.description = "Description is required";
+    if (!product_img) e.product_img = "Certificate is required";
+    if (!certificates) e.certificates = "Business permit is required";
+    return e;
+  };
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      setStatusMessage("Please fix the errors above.");
-      setStatusType("error");
+  const handleRegisterClick = () => {
+    const e = validate();
+    if (Object.keys(e).length > 0) {
+      setErrors(e);
       return;
     }
-
     setShowConsentModal(true);
   };
 
+ 
   const handleConfirmConsent = () => {
     setConsent(true);
     setShowConsentModal(false);
-    handleSubmit(); 
+    handleSubmit();
   };
 
   const handleSubmit = async () => {
-    setErrors({});
+    const e = validate();
+    if (Object.keys(e).length > 0) {
+      setErrors(e);
+      return;
+    }
+
     if (!consent) {
-      setErrors({ consent: "You must give consent to proceed!" });
-      setStatusMessage("Please provide consent to proceed.");
-      setStatusType("error");
+      Alert.alert("Consent Required", "You must agree to proceed.");
       return;
     }
 
     try {
       const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        Alert.alert("Unauthorized", "Please login first.");
-        return;
-      }
-
-      setStatusMessage("Registering business...");
+      setStatusMessage("Registering business......");
       setStatusType("success");
-
       const formData = new FormData();
       formData.append("name", name);
-      formData.append("address", address);
       formData.append("registered_business_name", business_name);
-      formData.append("description", description);
       formData.append("email", email);
       formData.append("password", password);
+      formData.append("address", address);
       formData.append("contact_no", contact_no);
+      formData.append("description", description);
 
       const appendFile = (key, file) => {
         if (!file) return;
@@ -141,112 +146,143 @@ export default function RegisterProduct() {
       appendFile("certificates", certificates);
       appendFile("logo", logo);
 
-      const response = await axios.post("https://backend1-al4l.onrender.com/api/business", formData, {
-        headers: { "Content-Type": "multipart/form-data", Authorization: `Bearer ${token}` },
+      await axios.post("https://backend1-al4l.onrender.com/api/business", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
       });
-
-      Alert.alert("Success", "Business registered successfully!");
+      
+      Alert.alert("Success", "Registration submitted.");
       setStatusMessage("✅ Business Submitted, Wait for the confirmation on your email account!");
       setStatusType("success");
-
-      setOwnerName(""); setAddress(""); setRegisteredBusinessName("");
-      setDescription(""); setProductImage(null); setCertificates(null); setBusinessLogo(null);
+      setName(""); setBusinessName(""); setAddress(""); setDescription("");
+      setProductImage(null); setCertificates(null); setLogo(null);
       setEmail(""); setPassword(""); setContactNo(""); setErrors({}); setConsent(false);
 
-    } catch (error) {
-      const msg = error.response?.data?.message;
-
-      if (msg?.includes("Registered Business Name")) setErrors(prev => ({ ...prev, business_name: "Business Name already exists!" }));
-      if (msg?.includes("Email")) setErrors(prev => ({ ...prev, email: "Email already exists!" }));
-
-      setStatusMessage("❌ Failed to register business.");
-      setStatusType("error");
+    } catch {
+      Alert.alert("Error", "Submission failed.");
+      setStatusMessage("Failed to register business!");
+      setStatusType(error);
     }
   };
 
   const [fontsLoaded] = useFonts({
-    "Garet-Book": require("../../assets/fonts/garet/Garet-Book.ttf"),
-    "Garet-Heavy": require("../../assets/fonts/garet/Garet-Heavy.ttf"),
     "Montserrat-Regular": require("../../assets/fonts/Montserrat/static/Montserrat-Regular.ttf"),
   });
-
-  if (!fontsLoaded) return <View><Text>Loading fonts...</Text></View>;
+  if (!fontsLoaded) return null;
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={[styles.scrollContainer, { paddingHorizontal: isMobile ? 20 : 70 }]}>
-      <Text style={[styles.title, { fontSize: isMobile ? 28 : 40 }]}>Register Business</Text>
-      
-      <View style={{ flexDirection: isMobile ? "column" : "row", justifyContent: "space-between", gap: 20 }}>
-        {/* LEFT COLUMN */}
-        <View style={{ flex: 1 }}>
-          <Text style={styles.label}>OWNER NAME*</Text>
-          <TextInput placeholder="Name of the Owner" value={name} onChangeText={setOwnerName} style={[styles.input, errors.name && { borderColor: "red" }]} />
-          {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+    <ScrollView
+      style={{ flex: 1, backgroundColor: "#f6f7fb" }}
+      contentContainerStyle={{ alignItems: "center", paddingVertical: 20 }}
+    >
+      <View style={[styles.card, isMobile && { flexDirection: "column" }]}>
+        {/* LEFT IMAGE */}
+        <View style={[styles.leftPanel, isMobile && { width: "100%", height: 200 }]}>
+          <Image
+            source={require("../../assets/business.png")}
+            style={styles.leftImage}
+            resizeMode="cover"
+          />
+        </View>
 
-          <Text style={styles.label}>ADDRESS*</Text>
-          <TextInput placeholder="Address" value={address} onChangeText={setAddress} style={[styles.input, errors.address && { borderColor: "red" }]} />
-          {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
+        {/* RIGHT FORM */}
+        <View style={[styles.rightPanel, isMobile && { width: "100%" }]}>
+          <Text style={styles.title}>Register Business</Text>
+          <View style={[styles.row, isMobile && { flexDirection: "column" }]}>
+            <View style={[styles.col, isMobile && { minWidth: "100%"}]}>
+              <Text style={styles.label}>Owner Name*</Text>
+              <TextInput
+                style={[styles.input, errors.name && styles.inputError]}
+                value={name}
+                onChangeText={setName}
+              />
+              {errors.name && <Text style={styles.error}>{errors.name}</Text>}
 
-          <Text style={styles.label}>BUSINESS NAME*</Text>
-          <TextInput placeholder="Your DTI Registered Business Name" value={business_name} onChangeText={setRegisteredBusinessName} style={[styles.input, errors.business_name && { borderColor: "red" }]} />
-          {errors.business_name && <Text style={styles.errorText}>{errors.business_name}</Text>}
+              <Text style={styles.label}>Business Name*</Text>
+              <TextInput
+                style={[styles.input, errors.business_name && styles.inputError]}
+                value={business_name}
+                onChangeText={setBusinessName}
+              />
+              {errors.business_name && <Text style={styles.error}>{errors.business_name}</Text>}
 
-          <Text style={styles.label}>EMAIL*</Text>
-          <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={[styles.input, errors.email && { borderColor: "red" }]} />
-          {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+              <Text style={styles.label}>Email*</Text>
+              <TextInput
+                style={[styles.input, errors.email && styles.inputError]}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+              />
+              {errors.email && <Text style={styles.error}>{errors.email}</Text>}
+            </View>
 
-          <Text style={styles.label}>PASSWORD*</Text>
-          <View style={styles.passwordWrapper}>
-            <TextInput placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry={!show} style={[styles.passwordInput, errors.password && { borderColor: "red" }]} />
-            <Pressable style={styles.showButton} onPress={() => setShow(!show)}>
-              <Text style={styles.showButtonText}>{show ? "Hide" : "Show"}</Text>
-            </Pressable>
+            <View style={[styles.col, isMobile && { minWidth: "100%"}]}>
+              <Text style={styles.label}>Address*</Text>
+              <TextInput
+                style={[styles.input, errors.address && styles.inputError]}
+                value={address}
+                onChangeText={setAddress}
+              />
+              {errors.address && <Text style={styles.error}>{errors.address}</Text>}
+
+              <Text style={styles.label}>Contact Number*</Text>
+              <TextInput
+                style={[styles.input, errors.contact_no && styles.inputError]}
+                value={contact_no}
+                keyboardType="numeric"
+                maxLength={11}
+                onChangeText={(t) => setContactNo(t.replace(/[^0-9]/g, ""))}
+              />
+              {errors.contact_no && <Text style={styles.error}>{errors.contact_no}</Text>}
+
+              <Text style={styles.label}>Password*</Text>
+              <TextInput
+                secureTextEntry
+                style={[styles.input, errors.password && styles.inputError]}
+                value={password}
+                onChangeText={setPassword}
+              />
+              {errors.password && <Text style={styles.error}>{errors.password}</Text>}
+            </View>
           </View>
-          {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
-          <Text style={styles.label}>CONTACT NUMBER*</Text>
-          <TextInput placeholder="Contact Number" value={contact_no} keyboardType="numeric" maxLength={11} onChangeText={(text) => setContactNo(text.replace(/[^0-9]/g, ""))} style={[styles.input, errors.contact_no && { borderColor: "red" }]} />
-          {errors.contact_no && <Text style={styles.errorText}>{errors.contact_no}</Text>}
-        </View>
+          <Text style={styles.label}>Description*</Text>
+          <TextInput
+            multiline
+            style={[styles.textArea, errors.description && styles.inputError]}
+            value={description}
+            onChangeText={setDescription}
+          />
+          {errors.description && <Text style={styles.error}>{errors.description}</Text>}
 
-        {/* RIGHT COLUMN */}
-        <View style={{ flex: 1, marginTop: isMobile ? -180 : 0}}>
-          <Text style={styles.label}>DESCRIPTION*</Text>
-          <TextInput placeholder="Description" value={description} onChangeText={setDescription} multiline style={[styles.input, { height: isMobile ? 300 : 125, textAlignVertical: "bottom", }, errors.description && { borderColor: "red" }]} />
-          {errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
-
-          <Text style={styles.label}>CERTIFICATE*</Text>
-          <Pressable onPress={() => pickImage(setProductImage)} style={[styles.uploadBox, errors.product_img && { borderColor: "red" }]}>
-            <Text style={{ fontSize: 26 }}>📷</Text>
-            {!product_img ? <Text style={styles.uploadText}>Upload Certificate</Text> : <Text style={styles.uploadedText}>Uploaded: {product_img.name}</Text>}
+          <Pressable style={styles.upload} onPress={() => pickImage(setProductImage)}>
+            <Text>{product_img ? product_img.name : "Upload Certificate*"}</Text>
           </Pressable>
-          {errors.product_img && <Text style={styles.errorText}>{errors.product_img}</Text>}
+          {errors.product_img && <Text style={styles.error}>{errors.product_img}</Text>}
 
-          <Text style={styles.label}>BUSINESS PERMIT*</Text>
-          <Pressable onPress={() => pickImage(setCertificates)} style={[styles.uploadBox, errors.certificates && { borderColor: "red" }]}>
-            <Text style={{ fontSize: 26 }}>📜</Text>
-            {!certificates ? <Text style={styles.uploadText}>Upload Business Permit</Text> : <Text style={styles.uploadedText}>Uploaded: {certificates.name}</Text>}
+          <Pressable style={styles.upload} onPress={() => pickImage(setCertificates)}>
+            <Text>{certificates ? certificates.name : "Upload Business Permit*"}</Text>
           </Pressable>
-          {errors.certificates && <Text style={styles.errorText}>{errors.certificates}</Text>}
+          {errors.certificates && <Text style={styles.error}>{errors.certificates}</Text>}
 
-          <Text style={styles.label}>BUSINESS LOGO (Optional)</Text>
-          <Pressable onPress={() => pickImage(setBusinessLogo)} style={[styles.uploadBox, errors.logo && { borderColor: "red" }]}>
-            <Text style={{ fontSize: 26 }}>🏢</Text>
-            {!logo ? <Text style={styles.uploadText}>Upload Business Logo</Text> : <Text style={styles.uploadedText}>Uploaded: {logo.name}</Text>}
+          <Pressable style={styles.upload} onPress={() => pickImage(setLogo)}>
+            <Text>{logo ? logo.name : "Upload Business Logo"}</Text>
           </Pressable>
-          {errors.logo && <Text style={styles.errorText}>{errors.logo}</Text>}
 
-          <Pressable onPress={handleRegisterClick} style={styles.submitButton}>
-            <Text style={styles.submitText}>Register</Text>
+          <Pressable style={styles.submitBtn} onPress={handleRegisterClick}>
+            <Text style={styles.submitText}>Submit</Text>
           </Pressable>
-        </View>
-      </View>
 
-      {statusMessage ? (
+          {statusMessage ? (
         <Text style={[styles.statusMessage, statusType === "success" ? styles.successMessage : styles.errorMessage]}>
           {statusMessage}
-        </Text>
+        </Text>  
       ) : null}
+        </View>
+      </View>
+      
 
       {/* Consent Modal */}
       {showConsentModal && (
@@ -282,22 +318,100 @@ export default function RegisterProduct() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#FFFFFF" },
-  scrollContainer: { paddingVertical: 24 },
-  title: { marginBottom: 20, fontWeight: "bold", fontFamily: "Garet-Heavy" },
-  label: { fontSize: 14, fontWeight: "700", fontFamily: "Montserrat-Regular", marginBottom: 6 },
-  input: { borderWidth: 1, borderColor: "#000", borderRadius: 12, paddingVertical: 10, paddingHorizontal: 14, marginBottom: 8, backgroundColor: "#FFFFFF", fontFamily: "Montserrat-Regular", fontSize: 13 },
-  errorText: { color: "red", fontSize: 12, marginTop: 1, marginBottom: 8, fontFamily: "Montserrat-Regular" },
-  uploadBox: { borderWidth: 1.5, borderStyle: "dashed", borderColor: "#999", borderRadius: 10, paddingVertical: 20, alignItems: "center", marginBottom: 20, backgroundColor: "#fafafa", justifyContent: "center" },
-  uploadText: { fontSize: 16, fontWeight: "600", color: "#444" },
-  uploadedText: { fontWeight: "600", textAlign: "center", marginBottom: 0, fontFamily: "Montserrat-Regular", color: "#0A84FF" },
-  submitButton: { backgroundColor: "#e98669", paddingVertical: 14, borderRadius: 20, alignSelf: "center", width: 160, marginTop: 10 },
-  submitText: { color: "#000", fontWeight: "700", fontFamily: "Montserrat-Regular", textAlign: "center", letterSpacing: 1 },
+  card: {
+    width: "85%",
+    maxWidth: 1100,
+    minHeight: 400,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    overflow: "hidden",
+    flexDirection: "row",
+    elevation: 6,
+  },
+  leftPanel: {
+    width: "40%",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 0,
+    height: "100%",
+  },
+  leftImage: {
+    width: "100%",
+    height: "100%",
+  },
+  rightPanel: {
+    flex: 1,
+    padding: 28,
+    backgroundColor: "#fff",
+  },
   statusMessage: { padding: 10, borderRadius: 8, textAlign: "center", fontWeight: "600", marginTop: 20 },
   successMessage: { backgroundColor: "#d4edda", color: "#155724", fontFamily: "Montserrat-Regular" },
   errorMessage: { backgroundColor: "#f8d7da", color: "#721c24", fontFamily: "Montserrat-Regular" },
-  passwordWrapper: { position: "relative", width: "100%", justifyContent: "center" },
-  passwordInput: { borderWidth: 1, borderColor: "#000", borderRadius: 12, paddingVertical: 10, paddingHorizontal: 14, marginBottom: 10, backgroundColor: "#FFFFFF", fontFamily: "Montserrat-Regular", fontSize: 13, paddingRight: 70 },
-  showButton: { position: "absolute", right: 14, padding: 4, top: 7 },
-  showButtonText: { fontFamily: "Montserrat-Regular", fontSize: 14, color: "#444" },
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  row: {
+    flexDirection: "row",
+    gap: 20,
+  },
+  col: {
+    flex: 1,
+    minWidth: 280,
+    width: "100%",
+  },
+  label: {
+    fontWeight: "600",
+    marginBottom: 6,
+  },
+  input: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 4,
+    alignItems: "center",
+  },
+  textArea: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 12,
+    padding: 16,
+    height: 100,
+    textAlignVertical: "top",
+    marginBottom: 4,
+  },
+  inputError: {
+    borderColor: "red",
+  },
+  error: {
+    color: "red",
+    fontSize: 12,
+    marginBottom: 12,
+  },
+  upload: {
+    borderWidth: 1,
+    borderStyle: "dashed",
+    borderColor: "#aaa",
+    padding: 14,
+    borderRadius: 12,
+    marginTop: 10,
+    alignItems: "center",
+  },
+  submitBtn: {
+    backgroundColor: "#5177b0",
+    padding: 16,
+    borderRadius: 14,
+    marginTop: 25,
+    alignItems: "center",
+    marginBottom: 5,
+  },
+  submitText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
 });

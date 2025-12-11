@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     fontFamily: "Montserrat-Regular",
   },
   activeNavText: {
-    color: "#d6461f",
+    color: "#5177b0",
     fontWeight: "bold",
   },
   menuIcon: {

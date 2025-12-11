@@ -148,7 +148,7 @@ export default function RegisterProduct() {
         });
       }
 
-      await axios.post("hhttps://backend1-al4l.onrender.com/api/products", formData, {
+      await axios.post("https://backend1-al4l.onrender.com/api/products", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
@@ -249,8 +249,8 @@ const styles = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", marginBottom: 20, justifyContent: "space-between", alignSelf: "center" },
   statusMessage: { alignSelf: "center", fontSize: 12, fontFamily: "Montserrat-Regular", color: "#67AA61", marginBottom: 10 },
   title: { fontSize: 40, fontFamily: "Garet-Heavy", color: "#000" },
-  backButton: { backgroundColor: "#e98669", height: 40, paddingHorizontal: 16, borderRadius: 20, justifyContent: "center", alignItems: "center" },
-  backText: { color: "#000", fontWeight: "700", fontFamily: "Montserrat-Regular" },
+  backButton: { backgroundColor: "#4A70A9", height: 40, paddingHorizontal: 16, borderRadius: 20, justifyContent: "center", alignItems: "center" },
+  backText: { color: "#ffffffff", fontWeight: "700", fontFamily: "Montserrat-Regular" },
   inputContainer: { marginBottom: 15 },
   input: { borderWidth: 1, borderColor: "#ccc", padding: 12, borderRadius: 8, backgroundColor: "#fafafa", width: "50%", alignSelf: "center" },
   textArea: { height: 100 },
@@ -258,6 +258,6 @@ const styles = StyleSheet.create({
   errorText: { color: "red", marginTop: 4, width: "50%", alignSelf: "center", textAlign: "left" },
   imagePicker: { borderWidth: 1, borderColor: "#ccc", padding: 20, borderRadius: 10, alignItems: "center", backgroundColor: "#fafafa", height: 200, justifyContent: "center", marginBottom: 3, width: "50%", alignSelf: "center" },
   imagePreview: { width: "100%", height: "100%", borderRadius: 10 },
-  submitButton: { backgroundColor: "#e98669", padding: 14, borderRadius: 50, alignItems: "center", alignSelf: "center", marginTop: 10, width: "25%", borderWidth: 1.3 },
-  submitText: { color: "black", fontSize: 16, fontWeight: "600" },
+  submitButton: { backgroundColor: "#4A70A9", padding: 14, borderRadius: 50, alignItems: "center", alignSelf: "center", marginTop: 10, width: "25%", borderWidth: 1.3 },
+  submitText: { color: "#ffff", fontSize: 16, fontWeight: "600" },
 });

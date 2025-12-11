@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useFonts } from "expo-font";
@@ -30,7 +31,6 @@ export default function BusinessDashboard() {
   const [isTallImage, setIsTallImage] = useState(false);
   const [businessname, setRegisteredBusinessName] = useState(null);
 
-
   useEffect(() => {
     const loadBusinessesName = async () => {
       const registered_business_name = await AsyncStorage.getItem("registered_business_name");
@@ -56,16 +56,18 @@ export default function BusinessDashboard() {
     };
     fetchProducts();
   }, []);
+
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
   const openModal = (product) => {
     setSelectedProduct(product);
     if (product.product_image) {
-    Image.getSize(product.product_image, (width, height) => {
-      setIsTallImage(height > width * 1.2);
-    });
-  }
+      Image.getSize(product.product_image, (width, height) => {
+        setIsTallImage(height > width * 1.2);
+      });
+    }
     setModalVisible(true);
   };
 
@@ -95,16 +97,8 @@ export default function BusinessDashboard() {
       <html>
         <head>
           <style>
-            body { 
-              text-align: center; 
-              padding: 20px; 
-              font-family: Arial; 
-            }
-            img {
-              width: 220px;
-              height: 220px;
-              margin-top: 20px;
-            }
+            body { text-align: center; padding: 20px; font-family: Arial; }
+            img { width: 220px; height: 220px; margin-top: 20px; }
           </style>
         </head>
         <body>
@@ -124,6 +118,8 @@ export default function BusinessDashboard() {
     "Garet-Book": require("../../assets/fonts/garet/Garet-Book.ttf"),
     "Garet-Heavy": require("../../assets/fonts/garet/Garet-Heavy.ttf"),
     "Montserrat-Regular": require("../../assets/fonts/Montserrat/static/Montserrat-Regular.ttf"),
+    "Montserrat-Bold": require("../../assets/fonts/Montserrat/static/Montserrat-Bold.ttf"),
+    "Montserrat-Black": require("../../assets/fonts/Montserrat/static/Montserrat-Black.ttf"),
   });
 
   if (!fontsLoaded) {
@@ -135,97 +131,84 @@ export default function BusinessDashboard() {
   }
 
   return (
-    
     <ScrollView
       style={{ flex: 1, backgroundColor: "#FFFFFF" }}
-      contentContainerStyle={{ alignItems: "center", paddingVertical: 60, paddingHorizontal: 40 }}
+      contentContainerStyle={{ alignItems: "center", paddingVertical: 40, paddingHorizontal: 20 }}
     >
+      {/* Welcome Section */}
+      <View style={{ width: "100%", maxWidth: 900, marginBottom: 10 }}>
+        <Text
+          style={{
+            fontSize: isMobile ? 22 : 32,
+            fontFamily: "Garet-Heavy",
+            color: "#000",
+            textAlign: isMobile ? "center" : "left",
+          }}
+        >
+          Welcome,
+        </Text>
+        <Text
+          style={{
+            fontSize: 20,
+            fontFamily: "Montserrat-Black",
+            color: "#4A70A9",
+            textAlign: isMobile ? "center" : "left",
+            marginTop: 4,
+          }}
+        >
+          {businessname || ""}
+        </Text>
+      </View>
+
+      {/* Header Controls */}
       <View
         style={{
           width: "100%",
           maxWidth: 900,
           flexDirection: "column",
-          alignItems: isMobile ? "center" : "flex-start",
-          marginBottom: 50,
+          alignItems: "stretch",
+          gap: 12,
+          marginBottom: 30,
         }}
       >
         <Text
           style={{
-            fontSize: 48,  
-            fontFamily: "Garet-Heavy",
-            color: "#000",
-            textAlign: "center",
-            marginBottom: 8,
-          }}
-        >
-          Welcome,{" "}
-          <Text
-            style={{
-              fontSize: 28, 
-              fontFamily: "Garet-Regular",
-              color: "#b04224",
-              textAlign: isMobile ? "center" : "left",
-              marginBottom: 4,
-            }}
-          >
-            {businessname ? businessname : ""}
-          </Text>
-        </Text>
-      </View>
-        
-      {/* Header */}
-      <View
-        style={{
-          width: "100%",
-          maxWidth: 900,
-          flexDirection: "row",
-          justifyContent: isMobile ? "center" : "space-between",
-          textAlign: "center",
-          marginBottom: 50,
-          gap: 20,
-          flexWrap: "wrap",
-        }}
-      >
-        <Text
-          style={{
-            fontSize: 32,
+            fontSize: isMobile ? 22 : 26,
             fontFamily: "Garet-Heavy",
             color: "#000",
             textAlign: isMobile ? "center" : "left",
-            width: isMobile ? "100%" : "auto",
           }}
         >
           Business Dashboard
         </Text>
-        <Text style={{ fontSize: 16, fontFamily: "Montserrat-Regular", marginBottom: 20}}>
-          Total Products: {filteredProducts.length}
-        </Text>
+
         <TextInput
           placeholder="Search products..."
           placeholderTextColor="#999"
           style={{
             width: "100%",
-            paddingVertical: 10,
-            paddingHorizontal: 16,
+            paddingVertical: 12,
+            paddingHorizontal: 18,
             borderWidth: 2,
             borderColor: "#000",
             borderRadius: 32,
-            marginBottom: 20,
             fontFamily: "Montserrat-Regular",
           }}
           value={searchQuery}
-          onChangeText={(text) =>{
+          onChangeText={(text) => {
             setSearchQuery(text);
             setVisibleCount(9999);
           }}
-          />
-        {/* REGISTER PRODUCT BUTTON */}
+        />
+
         <Pressable
           style={{
-            backgroundColor: "#e98669",
-            paddingVertical: 12,
-            paddingHorizontal: 24,
-            borderRadius: 30,
+            width: "100%",
+            backgroundColor: "#4A70A9",
+            paddingVertical: 14,
+            borderRadius: 999,
+            alignItems: "center",
+            justifyContent: "center",
             shadowColor: "#000",
             shadowOpacity: 0.1,
             shadowRadius: 3,
@@ -235,18 +218,30 @@ export default function BusinessDashboard() {
         >
           <Text
             style={{
-              color: "#000",
-              fontWeight: "700",
-              fontFamily: "Montserrat-Regular",
+              color: "#fff",
+              fontFamily: "Montserrat-Bold",
+              fontSize: 14,
+              letterSpacing: 0.5,
             }}
           >
-            REGISTER PRODUCT +
+            + Register Product
           </Text>
         </Pressable>
       </View>
 
       {/* Product List */}
-      <View style={{ width: "100%", maxWidth: 900, alignSelf: "center" }}>
+      <View style={{ width: "100%", maxWidth: 900 }}>
+        <Text
+          style={{
+            fontSize: 14,
+            fontFamily: "Montserrat-Regular",
+            marginBottom: 10,
+            textAlign: isMobile ? "center" : "left",
+          }}
+        >
+          Total Products: {filteredProducts.length}
+        </Text>
+
         <FlatList
           data={filteredProducts.slice(0, visibleCount)}
           keyExtractor={(item) => item.id}
@@ -258,53 +253,50 @@ export default function BusinessDashboard() {
                 backgroundColor: "#fff",
                 borderWidth: 2,
                 borderColor: "#000",
-                borderRadius: 12,
-                padding: 20,
-                marginBottom: 20,
+                borderRadius: 14,
+                padding: 16,
+                marginBottom: 16,
                 width: "100%",
               }}
             >
               <View
                 style={{
                   flexDirection: "row",
-                  justifyContent: "space-between",
                   alignItems: "center",
-                  gap: 12,
+                  gap: 10,
                 }}
               >
                 {item.product_image && (
-                  <View 
-                  style={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: 8,
-                    overflow: "hidden",
-                    backgroundColor: "#f0f0f0",
-                  }}
-                  >
                   <Image
-                  source={{ uri: item.product_image }}
-                  style={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: 8,
-                    resizeMode: "cover",
-                  }}
+                    source={{ uri: item.product_image }}
+                    style={{
+                      width: 70,
+                      height: 70,
+                      borderRadius: 10,
+                      resizeMode: "cover",
+                    }}
                   />
-                  </View>
                 )}
-                <Text style={{ fontWeight: "bold", fontSize: 16, flex: 1}}>{item.name}</Text>
+
+                <View style={{ flex: 1 }}>
+                  <Text style={{ fontWeight: "bold", fontSize: 14 }}>
+                    {item.name}
+                  </Text>
+                </View>
+
                 <Pressable
                   onPress={() => openModal(item)}
                   style={{
                     borderWidth: 2,
                     borderColor: "#000",
                     borderRadius: 20,
-                    paddingVertical: 6,
-                    paddingHorizontal: 14,
+                    paddingVertical: 8,
+                    paddingHorizontal: 12,
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
-                  <Text style={{ fontWeight: "600" }}>SHOW DETAILS</Text>
+                  <Ionicons name="eye-outline" size={18} color="#000" />
                 </Pressable>
               </View>
             </View>
@@ -320,7 +312,6 @@ export default function BusinessDashboard() {
           </Text>
         </Pressable>
       )}
-
       {/* Modal */}
       <Modal visible={modalVisible} animationType="fade" transparent={true}>
         <View
@@ -438,7 +429,7 @@ export default function BusinessDashboard() {
                     <Pressable
                       onPress={() => printQRCode(selectedProduct.qr_code)}
                       style={{
-                        backgroundColor: "#e98669",
+                        backgroundColor: "#4A70A9",
                         paddingVertical: 6,
                         paddingHorizontal: 10,
                         borderRadius: 6,
@@ -448,7 +439,7 @@ export default function BusinessDashboard() {
                     >
                       <Text
                         style={{
-                          color: "#000",
+                          color: "#ffffffff",
                           textAlign: "center",
                           fontWeight: "700",
                           fontFamily: "Montserrat-Regular",
@@ -462,7 +453,7 @@ export default function BusinessDashboard() {
                     <Pressable
                       onPress={() => downloadQRCode(selectedProduct.qr_code)}
                       style={{
-                        backgroundColor: "#e98669",
+                        backgroundColor: "#4A70A9",
                         paddingVertical: 6,
                         paddingHorizontal: 10,
                         borderRadius: 6,
@@ -472,7 +463,7 @@ export default function BusinessDashboard() {
                     >
                       <Text
                         style={{
-                          color: "#000",
+                          color: "#ffffffff",
                           textAlign: "center",
                           fontWeight: "700",
                           fontFamily: "Montserrat-Regular",
@@ -524,7 +515,7 @@ export default function BusinessDashboard() {
                           Linking.openURL(`https://eth-sepolia.blockscout.com/tx/${selectedProduct.tx_hash}`)
                         }
                         style={{
-                          backgroundColor: "#e98669",
+                          backgroundColor: "#4A70A9",
                           paddingVertical: 10,
                           borderRadius: 6,
                           marginTop: 5,
@@ -535,7 +526,7 @@ export default function BusinessDashboard() {
                             fontWeight: "700",
                             fontFamily: "Montserrat-Regular",
                             textAlign: "center",
-                            color: "#000",
+                            color: "#ffffffff",
                           }}
                         >
                           VIEW BLOCKCHAIN

@@ -27,7 +27,7 @@ export default function LoginButtons() {
     >
       {/* Continue as Buyer */}
       <TouchableOpacity
-        onPress={() => router.push("/buyer/qrScanner")}
+        onPress={() => router.push("/buyer/qrscanner")}
         style={{
           backgroundColor: "#FFFFFF",
           paddingVertical: 12,
@@ -42,7 +42,7 @@ export default function LoginButtons() {
       >
         <Text
           style={{
-            color: "#d6461f",
+            color: "#5177b0",
             fontSize: 16,
             fontWeight:"bold",
             fontFamily: "Garet-Book",
@@ -69,13 +69,13 @@ export default function LoginButtons() {
       >
         <Text
           style={{
-            color: "#d6461f",
+            color: "#5177b0",
             fontSize: 16,
             fontWeight: "bold",
             fontFamily: "Garet-Book",
           }}
         >
-          Register
+          Join us
         </Text>
       </TouchableOpacity>
     </View>

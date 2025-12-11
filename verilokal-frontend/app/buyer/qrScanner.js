@@ -167,8 +167,8 @@ export default function ProductScanner() {
         <View
           id="qr-reader"
           style={{
-            width: isMobile ? 300: 400, // Increased from 250 to 300
-            height: isMobile ? 300: 400, // Increased from 250 to 300
+            width: isMobile ? 300: 400, 
+            height: isMobile ? 300: 400,
             borderWidth: 2,
             borderColor: "#000",
             borderRadius: 16,
@@ -189,8 +189,8 @@ export default function ProductScanner() {
         {/* Instructions Box */}
         <View
           style={{
-            width: isMobile ? 300: 400, // Increased from 250 to 300
-            height: isMobile ? 300: 400, // Increased from 250 to 300
+            width: isMobile ? 300: 400, 
+            height: isMobile ? 300: 400,
             borderWidth: 2,
             borderColor: "#000",
             borderRadius: 16,
@@ -220,7 +220,7 @@ export default function ProductScanner() {
           >
             {instructions.map((instruction, index) => (
               <View key={index} style={{ flexDirection: "row", marginBottom: 10, alignItems: "flex-start" }}>
-                <Text style={{ fontSize: 16, color: "#e98669", marginRight: 10, fontWeight: "bold" }}>
+                <Text style={{ fontSize: 16, color: "#4A70A9", marginRight: 10, fontWeight: "bold" }}>
                   {index + 1}.
                 </Text>
                 <Text
@@ -245,7 +245,7 @@ export default function ProductScanner() {
         <Pressable
           onPress={startScanner}
           style={{
-            backgroundColor: "#e98669",
+            backgroundColor: "#4A70A9",
             paddingVertical: 12,
             paddingHorizontal: 24,
             borderRadius: 30,
@@ -259,7 +259,7 @@ export default function ProductScanner() {
             style={{
               fontFamily: "Montserrat-Regular",
               fontWeight: "700",
-              color: "#000",
+              color: "#ffffffff",
             }}
           >
             START
@@ -306,7 +306,7 @@ export default function ProductScanner() {
         >
           <Text
             style={{
-              color: "#b71c1c",
+              color: "#4A70A9",
               fontWeight: "600",
               textAlign: "center",
             }}
@@ -345,7 +345,7 @@ export default function ProductScanner() {
           style={{
             backgroundColor: "#fff7e2",
             borderWidth: 1,
-            borderColor: "#ffe6b5",
+            borderColor: "#4A70A9",
             borderRadius: 12,
             padding: 12,
             marginBottom: 20,
@@ -354,7 +354,7 @@ export default function ProductScanner() {
         >
           <Text
             style={{
-              color: "#ff8c00",
+              color: "#4A70A9",
               fontWeight: "600",
               textAlign: "center",
             }}
